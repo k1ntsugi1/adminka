@@ -5,9 +5,25 @@
  * @returns {object} - returns the new object
  */
 export const pick = (startObj, ...fields) => {
-    return Object.fromEntries(
-        Object.entries(startObj).filter(([key]) => fields.includes(key))
-    )
+    const objOfFields  = fields.reduce((acc, item) => {
+        acc[item] = item;
+        return acc;
+    }, {});
+    const isObject = (value) =>  typeof value === 'object' && value !== null;
+    const isArray = (value) => Array.isArray(value);
+
+    const getPickedObj = (currentValue) => {
+        if (!isObject(currentValue)) return currentValue;
+        if (isArray(currentValue)) return currentValue.map(getPickedObj);
+
+        const reducedCurrentValue = Object.entries(currentValue).reduce((acc, [key, value]) => {
+            if (objOfFields[key]) acc[key] = getPickedObj(value); 
+            return acc;
+        }, {});
+
+        return reducedCurrentValue;
+    };
+    return getPickedObj(startObj);
 };
 
 // для прошлой реализации при "не плоских" объектах: 

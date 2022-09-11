@@ -21,4 +21,32 @@ describe('javascript-data-types/pick', () => {
     expect(pick(obj, 'riba')).toEqual({});
     expect(pick(obj, 'riba')).toEqual({});
   });
+  it("should return object which uncludes deep properties", () => {
+    const obj = {
+      foo: 'foo',
+      bar: 'bar',
+      few: null,
+      zom: ['zom', 
+        [
+          {
+            tap: {
+              io : 'io'
+            }
+          }
+        ]
+      ]
+    };
+    expect(pick(obj, 'foo', 'zom', 'tap', 'few')).toEqual({
+      foo: 'foo',
+      few: null,
+      zom: ['zom', 
+        [
+          {
+            tap: {}
+          }
+        ]
+      ]
+    });
+    expect(pick(obj, 'io')).toEqual({})
+  })
 });
