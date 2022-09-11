@@ -5,19 +5,8 @@
  * @returns {object} - returns the new object
  */
 export const omit = (startObj, ...fields) => {
-    const objOfFields  = fields.reduce((acc, item) => {
-        acc[item] = item;
-        return acc;
-    }, {});
-    const getOmittedObj = (currentObj) => {
-        const reducedCurrentObj = Object.entries(currentObj).reduce((acc, [key, value]) => {
-            if (!objOfFields[key]) {
-                acc[key] = typeof value === 'object' ? getOmittedObj(value) : value;
-            }
-            return acc;
-        }, {});
-        return reducedCurrentObj;
-    };
-    return getOmittedObj(startObj);
+    return Object.fromEntries(
+        Object.entries(startObj).filter(([key]) => !fields.includes(key))
+    )
 
 };

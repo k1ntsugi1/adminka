@@ -15,8 +15,8 @@
 
 export function sortStrings(arr, param = 'asc') {
     const paramOfShift = param === 'asc' ? 1 : -1;
-
-    const sortedArr = arr.slice().sort((firstStr, secondStr) => {
+    const copyOfArr = [...arr];
+    const sortedArr = copyOfArr.sort((firstStr, secondStr) => {
         const resultOfComparing = firstStr.localeCompare(secondStr, configOfComparing.locales, configOfComparing.options);
         return resultOfComparing * paramOfShift;
     });

@@ -5,20 +5,12 @@
  * @returns {object} - returns the new object
  */
 export const pick = (startObj, ...fields) => {
-    const objOfFields  = fields.reduce((acc, item) => {
-        acc[item] = item;
-        return acc;
-    }, {});
-
-    const getPickedObj = (currentObj) => {
-        const reducedCurrentObj = Object.entries(currentObj).reduce((acc, [key, value]) => {
-            if (objOfFields[key]) {
-                acc[key] = typeof value === 'object' ? getPickedObj(value) : value;
-            }
-            return acc;
-        }, {});
-        return reducedCurrentObj;
-    };
-    return getPickedObj(startObj);
-
+    return Object.fromEntries(
+        Object.entries(startObj).filter(([key]) => fields.includes(key))
+    )
 };
+
+// для прошлой реализации при "не плоских" объектах: 
+// пришлось бы пробегаться по массивам и проверять их содержимое, что раздует код.
+// Я посмотрел тесты и понял какая реализация требуется.
+// (изначально я воспринял условие иначе, в след раз буду смотреть тесты, для полного понимания задачи) 
