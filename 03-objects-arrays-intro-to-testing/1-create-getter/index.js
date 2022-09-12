@@ -6,7 +6,6 @@
 export function createGetter(path) {
     const queueOfPaths = path.split('.');
     let currentResultOfSearching;
-
     const getter = (currentObj) => {
         if(!queueOfPaths.length) return currentResultOfSearching;
         const currentPath = queueOfPaths.shift();
@@ -14,6 +13,5 @@ export function createGetter(path) {
         currentResultOfSearching = currentObj[currentPath]
         return getter(currentObj[currentPath]);
     };
-
     return getter
 }
