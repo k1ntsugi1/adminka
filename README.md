@@ -1,3 +1,5 @@
+[![Tests workflow](https://github.com/k1ntsugi1/js-20220905_bulat9/actions/workflows/tests.yaml/badge.svg)](https://github.com/k1ntsugi1/js-20220905_bulat9/actions/workflows/tests.yaml)
+
 ## To start project:
 
 Для старта проекта необходимо выполнить следующие команды:
