@@ -12,9 +12,9 @@ export function trimSymbols(string, size = string.length) {
         }
         if (acc.counter <= size) {
             acc.counter += 1;
-            acc.cuttedStr.push(item);
+            acc.arrOfTrimmedSymb.push(item);
         }
         return acc;
-    }, { currentStr: null, counter: null, cuttedStr: [] });
-    return reducedString.cuttedStr.join('');
+    }, { currentStr: null, counter: null, arrOfTrimmedSymb: [] });
+    return reducedString.arrOfTrimmedSymb.join('');
 };
