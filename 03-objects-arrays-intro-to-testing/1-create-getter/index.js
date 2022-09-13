@@ -9,7 +9,7 @@ export function createGetter(path) {
     const getter = (currentObj) => {
         if(!queueOfPaths.length) return currentResultOfSearching;
         const currentPath = queueOfPaths.shift();
-        if(!Object.hasOwn(currentObj, currentPath)) return;
+        if(!currentObj.hasOwnProperty( currentPath)) return;
         currentResultOfSearching = currentObj[currentPath]
         return getter(currentObj[currentPath]);
     };
