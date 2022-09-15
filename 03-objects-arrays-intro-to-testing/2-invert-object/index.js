@@ -4,12 +4,10 @@
  * @returns {object | undefined} - returns new object or undefined if nothing did't pass
  */
 export function invertObj(obj) {
-    return (
-        obj 
-        ? Object.entries(obj).reduce((acc, [key, value]) => {
-            acc[value] = key;
-            return acc;
-        }, {})
-        : undefined
-    )
+  if (!obj) {return;}
+  const invertedObj = Object.entries(obj).reduce((acc, [key, value]) => {
+    acc[value] = key;
+    return acc;
+  }, {});
+  return invertedObj;
 }

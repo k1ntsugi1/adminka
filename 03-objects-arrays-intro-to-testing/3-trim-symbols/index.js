@@ -5,16 +5,16 @@
  * @returns {string} - the new string without extra symbols according passed size
  */
 export function trimSymbols(string, size = string.length) {
-    const reducedString = string.split('').reduce((acc, item) => {
-        if (acc.currentStr !== item) {
-            acc.currentStr = item;
-            acc.counter = 1;
-        }
-        if (acc.counter <= size) {
-            acc.counter += 1;
-            acc.arrOfTrimmedSymb.push(item);
-        }
-        return acc;
-    }, { currentStr: null, counter: null, arrOfTrimmedSymb: [] });
-    return reducedString.arrOfTrimmedSymb.join('');
-};
+  const { arrOfTrimmedSymb } = string.split('').reduce((acc, currentSymb) => {
+    if (acc.observableSymb !== currentSymb) {
+      acc.observableSymb = currentSymb;
+      acc.counterSymb = 1;
+    }
+    if (acc.counterSymb <= size) {
+      acc.counterSymb += 1;
+      acc.arrOfTrimmedSymb.push(currentSymb);
+    }
+    return acc;
+  }, { observableSymb: null, counterSymb: null, arrOfTrimmedSymb: [] });
+  return arrOfTrimmedSymb.join('');
+}
