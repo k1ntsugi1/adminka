@@ -1,16 +1,3 @@
-/**Исходя из Network (для образцового проекта):
-*   1) response -  объект данных формата "ДАТА: ЧИСЛО" (UPD - буду передавать массив, чтобы не делать это в конструкторе или в методах),
-*   2) request - url содержит какие данные мы хотим получить и с какой даты (sales || customers; from...)
-    +
-    В тестах сигнатура:
-*   data: [], // values[] UPD - в задании как раз скзано что переадется массив
-*   label: '',
-*   link: '',
-*   value: 0
-    ?formatHeading -> USD
-**/
-
-
 export default class ColumnChart {
   static maxChartHeight = 50; // общее свойство;
 
@@ -39,12 +26,13 @@ export default class ColumnChart {
         return acc;
       }, 0);
     }
-    const formatedValue = new Intl.NumberFormat('en').format(totalValue);
-    return this.formatHeading(formatedValue);
+    //const formatedValue = new Intl.NumberFormat('en').format(totalValue);
+    return this.formatHeading(totalValue);
   }
   _getLinkOfTitle(link) {
-    if (!link.length) {return '';}
-    return `<a class="column-chart__link" href="${link}">View all</a>`;
+    return !link.length
+      ? ''
+      : `<a class="column-chart__link" href="${link}">View all</a>`;
   }
   _createChart(currentValue) { // => []
     const currentValueByScale = Math.floor(this.scale * currentValue);
@@ -54,7 +42,7 @@ export default class ColumnChart {
   _getColumnChartBody() {
     return this.data.map((currentValue) => this._createChart(currentValue)).join('');
   }
-  get _template() {
+  get _fragmentOfBodyColumnChart() {
     const fragment = document.createElement('div');
     const bodyOfFragment = `
                 <div class="column-chart ${!this.data.length && 'column-chart_loading'}" style="--chart-height: 50">
@@ -76,7 +64,7 @@ export default class ColumnChart {
     return fragment.firstElementChild;
   }
   render() {
-    if (!this.element) {this.element = this._template;}
+    if (!this.element) {this.element = this._fragmentOfBodyColumnChart;}
     return this.element;
   }
   update(newData = []) {
