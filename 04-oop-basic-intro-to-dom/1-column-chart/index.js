@@ -41,9 +41,9 @@ export default class ColumnChart {
   _getColumnChartBody() {
     return this.data.map((currentValue) => this._createChart(currentValue)).join('');
   }
-  get _fragmentOfBodyColumnChart() {
-    const fragment = document.createElement('div');
-    const bodyOfFragment = `
+  get _elementOfBodyColumnChart() {
+    const element = document.createElement('div');
+    const bodyOfElement = `
                 <div class="column-chart ${!this.data.length && 'column-chart_loading'}" style="--chart-height: 50">
                     <div class="column-chart__title">
                         Total ${this.title}
@@ -59,8 +59,8 @@ export default class ColumnChart {
                     </div>
                 </div>
     `;
-    fragment.innerHTML = bodyOfFragment;
-    return fragment.firstElementChild;
+    element.innerHTML = bodyOfElement;
+    return element.firstElementChild;
   }
   render() {
     if (!this.element) {this.element = this._fragmentOfBodyColumnChart;}
