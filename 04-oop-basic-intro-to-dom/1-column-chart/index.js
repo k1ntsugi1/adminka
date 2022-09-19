@@ -1,11 +1,11 @@
 export default class ColumnChart {
-  static maxChartHeight = 50; // общее свойство;
+  static maxChartHeight = 50;
 
   constructor({data = [], label: title = '', link = '', value = 0, formatHeading = item => `${item}`} = {}) {
     this.data = data;
 
     this.formatHeading = formatHeading;
-    this.totalValueOfData = this._getTotalValueOfData(value); // Так и не понял, value может как передаться (тогда оставляем его), так и нет (тогда находим total)? 
+    this.totalValueOfData = this._getTotalValueOfData(value); 
     this.title = title;
     this.linkOfTitle = this._getLinkOfTitle(link);
     
@@ -26,7 +26,6 @@ export default class ColumnChart {
         return acc;
       }, 0);
     }
-    //const formatedValue = new Intl.NumberFormat('en').format(totalValue);
     return this.formatHeading(totalValue);
   }
   _getLinkOfTitle(link) {
@@ -34,7 +33,7 @@ export default class ColumnChart {
       ? ''
       : `<a class="column-chart__link" href="${link}">View all</a>`;
   }
-  _createChart(currentValue) { // => []
+  _createChart(currentValue) {
     const currentValueByScale = Math.floor(this.scale * currentValue);
     const currentValueByPercent = (currentValue / Math.max(...this.data) * 100).toFixed(0);
     return `<div style="--value: ${currentValueByScale}" data-tooltip="${currentValueByPercent}%"></div>`;
@@ -79,13 +78,4 @@ export default class ColumnChart {
     this.remove();
   }
 }
-
-// На вопрос зачем я разбил все на методы - каждый метод выполняет только свою задачу и тогда, как мне кажется, читаемость кода лучше и понятнее ход действий.
-// Правда чтобы понять как метод это делает, придется глазами поискать, поэтому, если класс с большим колличеством методов, то и искать придется дольше.
-// Но с другой стороны, если нас интересует только интерфейс инстанса, то реализация через подобное разбиение на методы как по мне лучше.
-
-
-//<---------------------------------------------------------Вопрос----------------------------------------------------->
-
-// Что предпочтительнее? Если методы маленькие, то выносить их нет смысла и лучше прописывать в "больших"? Или это просто дело "вкуса и читаемости кода в целом"?
 
