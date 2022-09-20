@@ -11,11 +11,26 @@
   import NotificationMessage from './index.js';
 
   btn1.addEventListener('click', () => {
-    const notification = new NotificationMessage('Hello World', {
-      duration: 2000,
-      type: 'success'
+    let notification = new NotificationMessage('hi', {
+      type: 'success',
+      duration: 5000
     });
 
     notification.show();
+
+    // notification = new NotificationMessage('hi', {
+    //   type: 'error',
+    //   duration: 3000,
+    // });
+
+    // notification.show();
   });
+  // btn1.addEventListener('click', () => {
+  //   let notification = new NotificationMessage('hi', {
+  //     type: 'success',
+  //     duration: 3000,
+  //   });
+
+  //   notification.show();
+  // });
 </script>

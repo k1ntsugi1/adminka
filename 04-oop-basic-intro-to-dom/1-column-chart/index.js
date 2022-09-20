@@ -5,19 +5,19 @@ export default class ColumnChart {
     this.data = data;
 
     this.formatHeading = formatHeading;
-    this.totalValueOfData = this._getTotalValueOfData(value); 
+    this.totalValueOfData = this.getTotalValueOfData(value); 
     this.title = title;
-    this.linkOfTitle = this._getLinkOfTitle(link);
+    this.linkOfTitle = this.getLinkOfTitle(link);
     
     this.chartHeight = this.constructor.maxChartHeight;
-    this.scale = this._getScale();
+    this.scale = this.getScale();
       
     this.render();
   }
-  _getScale() {
+  getScale() {
     return this.data.length > 0 ? (this.chartHeight / Math.max(...this.data)) : 1;
   }
-  _getTotalValueOfData(value) {
+  getTotalValueOfData(value) {
     let totalValue;
     if (value !== 0) {totalValue = value;}
     else {
@@ -28,20 +28,20 @@ export default class ColumnChart {
     }
     return this.formatHeading(totalValue);
   }
-  _getLinkOfTitle(link) {
+  getLinkOfTitle(link) {
     return !link.length
       ? ''
       : `<a class="column-chart__link" href="${link}">View all</a>`;
   }
-  _createChart(currentValue) {
+  createChart(currentValue) {
     const currentValueByScale = Math.floor(this.scale * currentValue);
     const currentValueByPercent = (currentValue / Math.max(...this.data) * 100).toFixed(0);
     return `<div style="--value: ${currentValueByScale}" data-tooltip="${currentValueByPercent}%"></div>`;
   }
-  _getColumnChartBody() {
-    return this.data.map((currentValue) => this._createChart(currentValue)).join('');
+  getColumnChartBody() {
+    return this.data.map((currentValue) => this.createChart(currentValue)).join('');
   }
-  get _elementOfBodyColumnChart() {
+  get elementOfBodyColumnChart() {
     const element = document.createElement('div');
     const bodyOfElement = `
                 <div class="column-chart ${!this.data.length && 'column-chart_loading'}" style="--chart-height: 50">
@@ -54,7 +54,7 @@ export default class ColumnChart {
                             ${this.totalValueOfData}
                         </div>
                         <div data-element="body" class="column-chart__chart">
-                          ${this._getColumnChartBody()}
+                          ${this.getColumnChartBody()}
                       </div>
                     </div>
                 </div>
@@ -63,7 +63,7 @@ export default class ColumnChart {
     return element.firstElementChild;
   }
   render() {
-    if (!this.element) {this.element = this._fragmentOfBodyColumnChart;}
+    if (!this.element) {this.element = this.elementOfBodyColumnChart;}
     return this.element;
   }
   update(newData = []) {
@@ -72,10 +72,11 @@ export default class ColumnChart {
     this.render();
   }
   remove() {
-    this.element.remove();
+    this.element?.remove();
   }
   destroy() {
     this.remove();
+    this.element = null;
   }
 }
 
