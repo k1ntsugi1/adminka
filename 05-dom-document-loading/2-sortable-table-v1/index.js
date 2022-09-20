@@ -5,13 +5,13 @@ export default class SortableTable {
     this.template = this.headerConfig[0].template ?? ((data = []) => '');
 
     this.cells = this.headerConfig.map(item => item.id);
-    this.sortableCells = this.headerConfig.filter(item => item.sortable);
+    this.sortableCells = this.headerConfig.filter(item => item.sortable).map(item => item.id);
 
     this.render();
   }
 
   sortDataOfTable(data = []) {
-    if (this.paramOfSort.order !== 'asc' && this.paramOfSort.order !== 'desc') {return data;}
+    if (!['asc', 'desc'].includes(this.paramOfSort.order) || !this.sortableCells.includes(this.paramOfSort.field)) {return data;}
 
     const paramOfShift = this.paramOfSort.order === 'asc' ? 1 : -1;
 
@@ -91,7 +91,7 @@ export default class SortableTable {
     this.paramOfSort = {field, order};
     this.data = this.sortDataOfTable(this.data);
     
-    const { body, header } = this.subElements;
+    const { body, header } = this.subElements; 
     body.innerHTML = this.getElementsOfTableBody(); 
     header.querySelector(`div[data-order]`)?.removeAttribute('data-order');
     header.querySelector(`div[data-id="${field}"]`).setAttribute('data-order', order);
