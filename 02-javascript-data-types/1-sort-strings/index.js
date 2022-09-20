@@ -5,20 +5,20 @@
  * @returns {string[]}
  */
 
- const configOfComparing = {
-    locales: ["ru", "en"], // порядок важен
-    options: {
-        caseFirst: 'upper',
-        numeric: true,
-    }
-}
+const configOfComparing = {
+  locales: ["ru", "en"], // порядок важен
+  options: {
+    caseFirst: 'upper',
+    numeric: true,
+  }
+};
 
 export function sortStrings(arr, param = 'asc') {
-    const paramOfShift = param === 'asc' ? 1 : -1;
-    const copyOfArr = [...arr];
-    const sortedArr = copyOfArr.sort((firstStr, secondStr) => {
-        const resultOfComparing = firstStr.localeCompare(secondStr, configOfComparing.locales, configOfComparing.options);
-        return resultOfComparing * paramOfShift;
-    });
-    return sortedArr;
+  const paramOfShift = param === 'asc' ? 1 : -1;
+  const copyOfArr = [...arr];
+  const sortedArr = copyOfArr.sort((firstStr, secondStr) => {
+    const resultOfComparing = firstStr.localeCompare(secondStr, configOfComparing.locales, configOfComparing.options);
+    return resultOfComparing * paramOfShift;
+  });
+  return sortedArr;
 }
