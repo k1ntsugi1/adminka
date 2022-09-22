@@ -83,7 +83,20 @@ body {
   display: inline-flex;
   cursor: pointer;
 }
-
+.sortable-table__sort-arrow_desc {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--grey-light);
+}
+.sortable-table__sort-arrow_asc {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid var(--grey-light);
+}
 .sortable-table__cell[data-order='asc'] .sort-arrow {
   width: 0;
   height: 0;
