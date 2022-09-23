@@ -19,36 +19,6 @@ export default class SortableTable {
     this.render();
   }
 
-  getSortedDataByUserParams(userParams) {
-    /// 
-  }
-
-  async getSortedDataRemotely() {
-    // maybe server will return not only data -> + sortedBy ... so paramЩfЫort will changed
-    // const response = await some ajax request...
-    // const { sortedBy, data } = response;
-    // this.paramOfSort = sortedBy;
-    // return data;
-
-    // UPD have to change sort() {} -> async sort() { ... }
-  }
-
-  getSortedDataLocally(data = this.data) {
-    const { field, order } = this.paramOfSort;
-    const paramOfShift = order === 'asc' ? 1 : -1;
-
-    const sortedArr = [...data].sort((firstItem, secondItem) => {
-      firstItem = firstItem[field];
-      secondItem = secondItem[field];
-
-      const resultOfComparing = typeof firstItem === 'string' 
-        ? firstItem.localeCompare(secondItem, ["ru", "en"], {caseFirst: 'upper', number: true})
-        : firstItem - secondItem;
-      return resultOfComparing * paramOfShift;
-    });
-    return sortedArr;
-  }
-
   getElementArrowOfSort() {
     return (
       `<span class="sortable-table__sort-arrow">
@@ -107,13 +77,6 @@ export default class SortableTable {
     return wrapper;
   }
 
-  render() {
-    this.element = this.getTableElement();
-    this.subElements = this.getSubElements();
-    this.addEventListeners();
-  }
-
-
   getSubElements() {
     const result = {};
     const elements = this.element.querySelectorAll('div[data-element]');
@@ -124,7 +87,40 @@ export default class SortableTable {
     return result;
   }
 
-  sortByHeaderTitleHandler = (event) => {
+  render() {
+    this.element = this.getTableElement();
+    this.subElements = this.getSubElements();
+    this.addEventListeners();
+  }
+
+  getSortedDataByUserParams(userParams) {
+    /// 
+  }
+
+  async getSortedDataRemotely({ field, order } = this.paramOfSort) {
+    throw new Error('I dont know url :(');
+  }
+
+  getSortedDataLocally(data = this.data, { field, order } = this.paramOfSort) {
+    const paramOfShift = order === 'asc' ? 1 : -1;
+
+    const sortedArr = [...data].sort((firstItem, secondItem) => {
+      firstItem = firstItem[field];
+      secondItem = secondItem[field];
+
+      const resultOfComparing = typeof firstItem === 'string' 
+        ? firstItem.localeCompare(secondItem, ["ru", "en"], {caseFirst: 'upper', number: true})
+        : firstItem - secondItem;
+      return resultOfComparing * paramOfShift;
+    });
+    return sortedArr;
+  }
+
+  sortByUserParamsHandler = (event) => { 
+    this.sort();
+  }
+
+  sortByHeaderTitleHandler = async (event) => {
     const sortableTarget = event.target.closest('div[data-sortable="true"]');
     if (!sortableTarget) {return;}
     let { dataset: 
@@ -137,50 +133,28 @@ export default class SortableTable {
       order = this.paramOfSort.order === 'asc' ? 'desc' : 'asc'; 
     }
     this.paramOfSort = { field, order };
+    this.data = await this.kindOfSort === 'locally'
+      ? this.getSortedDataLocally() 
+      : this.getSortedDataRemotely();
+
     this.sort();
   }
 
   addEventListeners() {
     const { header } = this.subElements;
+    // later i should add userEvent for userParamsOfSort
     header.addEventListener('click', this.sortByHeaderTitleHandler);
   }
 
   removeEventListeners() {
     const { header } = this.subElements; // странно, но тесты падают, будто элемент уже удален UPD -> ассинхронная операция удаления похоже что
-    header.removeEventListener('click', this.sortByHeaderTitleHandler);
+    header.removeEventListener('click', this.currentHandlerOfSort);
   }
 
-  sort(sortByUserParams = false, paramsOfSortByUserGoal = {}) {
-    const mappingFuncOfSortByKind = {
-      locally(thisOfTable) {
-        return thisOfTable.getSortedDataLocally();
-      },
-      remotely(thisOfTable) {
-        return thisOfTable.getSortedDataRemotely();
-      },
-      byUserParam(thisOfTable) {
-        return thisOfTable.getSortedDataByUserParams(paramsOfSortByUserGoal);
-      }
-    };
-    const currentKindOfSort = sortByUserParams ? 'byUserParam' : this.kindOfSort;
-    this.data = mappingFuncOfSortByKind[currentKindOfSort](this);
-
-    //const {field, order} = this.paramOfSort;
-
+  sort() {
     const { body, header } = this.subElements; 
     body.innerHTML = this.getElementsOfTableBody();
-    // more readable and shorted style
     header.innerHTML = this.getElementsOfTableHeader();
-
-    // less reatable style
-    // const oldFieldOfSort = header.querySelector(`div[data-order]`);
-    // const newFieldOfSort = header.querySelector(`div[data-id="${field}"]`);
-
-    // oldFieldOfSort.removeAttribute('data-order');
-    // oldFieldOfSort.removeChild(oldFieldOfSort.lastElementChild);
-
-    // newFieldOfSort.setAttribute('data-order', order);
-    // newFieldOfSort.insertAdjacentHTML('beforeend', this.getElementArrowOfSort());
   }
   remove() {
     //this.removeEventListeners();
