@@ -4,27 +4,36 @@ export default class SortableTable {
     sorted: {id, order} = {},
     isSortLocally = true,
   } = {}) {
-    this.isSortLocally = isSortLocally;
+    this.kindOfSort = isSortLocally ? 'locally' : 'remotely';
     this.headerConfig = headerConfig;
 
     this.template = this.headerConfig[0].template ?? ((data = []) => '');
 
     this.cells = this.headerConfig.map(item => item.id);
-    this.sortableCells = this.headerConfig.filter(item => item.sortable).map(item => item.id);
 
     this.paramOfSort = {
-      field: id ?? this.sortableCells[0],
+      field: id ?? this.headerConfig.find(cell => cell.sortable),
       order: order ?? 'asc'
     };
-    this.data = this.isSortLocally ? this.getSortedLocallyDataOfTable(data) : data;
+    this.data = this.kindOfSort === 'locally' ? this.getSortedDataLocally(data) : data;
     this.render();
   }
 
-  getSortedOnServerDataOfTable() {
-
+  getSortedDataByUserParams(userParams) {
+    /// 
   }
 
-  getSortedLocallyDataOfTable(data = this.data) {
+  async getSortedDataRemotely() {
+    // maybe server will return not only data -> + sortedBy ... so paramЩfЫort will changed
+    // const response = await some ajax request...
+    // const { sortedBy, data } = response;
+    // this.paramOfSort = sortedBy;
+    // return data;
+
+    // UPD have to change sort() {} -> async sort() { ... }
+  }
+
+  getSortedDataLocally(data = this.data) {
     const { field, order } = this.paramOfSort;
     const paramOfShift = order === 'asc' ? 1 : -1;
 
@@ -127,8 +136,7 @@ export default class SortableTable {
     if (this.paramOfSort.field === field) {
       order = this.paramOfSort.order === 'asc' ? 'desc' : 'asc'; 
     }
-    this.isSortLocally = true; // havo to relocate it or remove ( this is extra code i think ) UPD -> dont remove
-    this.paramOfSort = {field, order};
+    this.paramOfSort = { field, order };
     this.sort();
   }
 
@@ -142,14 +150,29 @@ export default class SortableTable {
     header.removeEventListener('click', this.sortByHeaderTitleHandler);
   }
 
-  sort() {
-    
-    this.data = this.isSortLocally ? this.getSortedLocallyDataOfTable() : this.getSortedOnServerDataOfTable();
-    const {field, order} = this.paramOfSort; // maybe server will return not only data -> + sortedBy ... so paramofsort will changed
+  sort(sortByUserParams = false, paramsOfSortByUserGoal = {}) {
+    const mappingFuncOfSortByKind = {
+      locally(thisOfTable) {
+        return thisOfTable.getSortedDataLocally();
+      },
+      remotely(thisOfTable) {
+        return thisOfTable.getSortedDataRemotely();
+      },
+      byUserParam(thisOfTable) {
+        return thisOfTable.getSortedDataByUserParams(paramsOfSortByUserGoal);
+      }
+    };
+    const currentKindOfSort = sortByUserParams ? 'byUserParam' : this.kindOfSort;
+    this.data = mappingFuncOfSortByKind[currentKindOfSort](this);
+
+    //const {field, order} = this.paramOfSort;
 
     const { body, header } = this.subElements; 
     body.innerHTML = this.getElementsOfTableBody();
+    // more readable and shorted style
     header.innerHTML = this.getElementsOfTableHeader();
+
+    // less reatable style
     // const oldFieldOfSort = header.querySelector(`div[data-order]`);
     // const newFieldOfSort = header.querySelector(`div[data-id="${field}"]`);
 
@@ -158,7 +181,6 @@ export default class SortableTable {
 
     // newFieldOfSort.setAttribute('data-order', order);
     // newFieldOfSort.insertAdjacentHTML('beforeend', this.getElementArrowOfSort());
-    // console.log(header);
   }
   remove() {
     //this.removeEventListeners();
