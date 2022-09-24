@@ -97,7 +97,7 @@ export default class SortableTable {
     /// 
   }
 
-  async getSortedDataRemotely({ field, order } = this.paramOfSort) {
+  async getSortedDataRemotely({ field, order } = this.paramOfSort) { // async operation
     throw new Error('I dont know url :(');
   }
 
@@ -120,13 +120,13 @@ export default class SortableTable {
     this.sort();
   }
 
-  sortByHeaderTitleHandler = (event) => {
+  sortByHeaderTitleHandler = async (event) => { //<------here changed | without async status of tests - without error
     console.log(event.target)
     const sortableTarget = event.target.closest('div[data-sortable="true"]');
     if (!sortableTarget) {return;}
     let { dataset: 
       { 
-        order = 'desc',
+        order = 'asc', // <----------here changed | with "desc" status of tests - without error  
         id: field
       } 
     } = sortableTarget;
@@ -134,9 +134,9 @@ export default class SortableTable {
       order = this.paramOfSort.order === 'asc' ? 'desc' : 'asc'; 
     }
     this.paramOfSort = { field, order };
-    this.data = this.kindOfSort === 'locally'
+    this.data = await this.kindOfSort === 'locally' 
       ? this.getSortedDataLocally() 
-      : this.getSortedDataRemotely();
+      : this.getSortedDataRemotely();// operation is async
 
     this.sort();
   }
@@ -148,7 +148,7 @@ export default class SortableTable {
   }
 
   removeEventListeners() {
-    const { header } = this.subElements; // странно, но тесты падают, будто элемент уже удален UPD -> ассинхронная операция удаления похоже что
+    const { header } = this.subElements; 
     header.removeEventListener('pointerdown', this.currentHandlerOfSort);
   }
 
@@ -158,8 +158,7 @@ export default class SortableTable {
     header.innerHTML = this.getElementsOfTableHeader();
   }
   remove() {
-    //this.removeEventListeners();
-    this.element?.remove();
+    //this.removeEventListeners(); // странно, но тесты падают, будто элемент уже удален UPD -> ассинхронная операция удаления похоже что
     this.element = null;
     this.subElements = {};
   }
