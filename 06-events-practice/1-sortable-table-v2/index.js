@@ -120,12 +120,13 @@ export default class SortableTable {
     this.sort();
   }
 
-  sortByHeaderTitleHandler = async (event) => {
+  sortByHeaderTitleHandler = (event) => {
+    console.log(event.target)
     const sortableTarget = event.target.closest('div[data-sortable="true"]');
     if (!sortableTarget) {return;}
     let { dataset: 
       { 
-        order = 'asc',
+        order = 'desc',
         id: field
       } 
     } = sortableTarget;
@@ -133,7 +134,7 @@ export default class SortableTable {
       order = this.paramOfSort.order === 'asc' ? 'desc' : 'asc'; 
     }
     this.paramOfSort = { field, order };
-    this.data = await this.kindOfSort === 'locally'
+    this.data = this.kindOfSort === 'locally'
       ? this.getSortedDataLocally() 
       : this.getSortedDataRemotely();
 
@@ -143,12 +144,12 @@ export default class SortableTable {
   addEventListeners() {
     const { header } = this.subElements;
     // later i should add userEvent for userParamsOfSort
-    header.addEventListener('click', this.sortByHeaderTitleHandler);
+    header.addEventListener('pointerdown', this.sortByHeaderTitleHandler);
   }
 
   removeEventListeners() {
     const { header } = this.subElements; // странно, но тесты падают, будто элемент уже удален UPD -> ассинхронная операция удаления похоже что
-    header.removeEventListener('click', this.currentHandlerOfSort);
+    header.removeEventListener('pointerdown', this.currentHandlerOfSort);
   }
 
   sort() {

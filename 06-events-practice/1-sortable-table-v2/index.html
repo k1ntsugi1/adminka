@@ -42,6 +42,23 @@
   });
 
   root.append(sortableTable.element);
-  //sortableTable.removeEventListeners()
+
+    
+    const { children } = sortableTable.subElements.header;
+    const [title, price] = children;
+
+    const pointerdown = new MouseEvent('pointerdown', {
+      bubbles: true
+    });
+
+    //title.dispatchEvent(pointerdown)
+    price.dispatchEvent(pointerdown);
+
+    // const { body } = sortableTable.subElements;
+    // const firstRow = body.firstElementChild;
+    // const lastRow = body.lastElementChild;
+
+    // console.log(firstRow)
+    // console.log(firstRow.textContent, lastRow.textContent);
 </script>
 </body>
