@@ -13,12 +13,11 @@ export default class DoubleSlider {
     this.min = min;
     this.max = max;
     this.range = this.max - this.min;
-    this.from = selected.from;
-    this.to = selected.to;
+    this.selected = selected;
 
     this.progressData = {
-      leftThumbShiftFromLeft: ((this.from - min) / (this.range)) * 100,
-      rightThumbShiftFromLeft: ((this.to - min) / (this.range)) * 100,
+      leftThumbShiftFromLeft: ((this.selected.from - min) / (this.range)) * 100,
+      rightThumbShiftFromLeft: ((this.selected.to - min) / (this.range)) * 100,
       kindOfThumb: '',
     };
 
@@ -27,16 +26,18 @@ export default class DoubleSlider {
 
   render() {
     const { leftThumbShiftFromLeft, rightThumbShiftFromLeft } = this.progressData;
+    const { from, to } = this.selected;
+
     const wrapper = document.createElement('div');
     wrapper.innerHTML = (
       `<div class="range-slider">
-            <span data-element="from">${this.formatValue(this.from)}</span>
+            <span data-element="from">${this.formatValue(from)}</span>
             <div class="range-slider__inner">
                 <span data-element="progress" class="range-slider__progress" style="left: ${leftThumbShiftFromLeft}%; right: ${100 - rightThumbShiftFromLeft}%"></span>
                 <span data-element="left-thumb" class="range-slider__thumb-left" style="left: ${leftThumbShiftFromLeft}%"></span>
                 <span data-element="right-thumb" class="range-slider__thumb-right" style="left: ${rightThumbShiftFromLeft}%"></span>
             </div>
-            <span data-element="to">${this.formatValue(this.to)}</span>
+            <span data-element="to">${this.formatValue(to)}</span>
        </div>`
     );
     this.element = wrapper.firstElementChild;
@@ -62,14 +63,13 @@ export default class DoubleSlider {
     const progress = this.subElements.progress;
 
     const shiftOfProgress = kindOfThumb === 'left' ? shiftFromLeft : 100 - shiftFromLeft;
-    const value = kindOfThumb === 'left' ? 'from' : 'to';
+    const kindOfSelected = kindOfThumb === 'left' ? 'from' : 'to';
 
     [progress.style[kindOfThumb], thumb.style.left] = [`${shiftOfProgress}%`, `${shiftFromLeft}%`];
 
-    this[value] = this.min + (this.range / 100 * shiftFromLeft);
-    console.log(value);
+    this.selected[kindOfSelected] = this.min + (this.range / 100 * shiftFromLeft);
 
-    target.textContent = this.formatValue(this[value]);
+    target.textContent = this.formatValue(this.selected[kindOfSelected]);
   }
 
   pointerMoveHandler = (event) => {
@@ -113,13 +113,10 @@ export default class DoubleSlider {
   }
 
   createEventRangeSelect() {
-    const { from, to } = this;
     const event = new CustomEvent("range-select", {
       bubles: true,
-      detail: {
-        from,
-        to
-      }});
+      detail: this.selected
+    });
     this.element.dispatchEvent(event);
   }
 
