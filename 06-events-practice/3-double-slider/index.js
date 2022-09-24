@@ -17,47 +17,24 @@ export default class DoubleSlider {
     this.to = selected.to;
 
     this.progressData = {
-      left: ((this.from - min) / (this.range)) * 100,
-      right: ((max - this.to) / (this.range)) * 100,
-      nameOfSide: '',
-    };
-
-    this.getValueOfDrop = {
-      left(thisOfDuobleSlider, clientX) {
-          
-        const {widthOfSlider, leftShiftOfSlider} = thisOfDuobleSlider;
-        const { right } = thisOfDuobleSlider.progressData;
-        const suppositiveValueOfDrop = +((clientX - leftShiftOfSlider) / widthOfSlider * 100).toFixed(0);
-
-        if (suppositiveValueOfDrop < 0 || suppositiveValueOfDrop > right) {return null;}
-        thisOfDuobleSlider.progressData.left = suppositiveValueOfDrop;
-        return suppositiveValueOfDrop;
-      },
-      right(thisOfDuobleSlider, clientX) {
-        const {widthOfSlider, leftShiftOfSlider} = thisOfDuobleSlider;
-        const { left } = thisOfDuobleSlider.progressData;
-        const suppositiveValueOfDrop = +((widthOfSlider - clientX + leftShiftOfSlider) / widthOfSlider * 100).toFixed(0);
-    
-        if (suppositiveValueOfDrop < 0 || suppositiveValueOfDrop > (100 - left)) {return null;}
-        thisOfDuobleSlider.progressData.right = 100 - suppositiveValueOfDrop;
-
-        return suppositiveValueOfDrop;
-      }
+      leftThumbShiftFromLeft: ((this.from - min) / (this.range)) * 100,
+      rightThumbShiftFromLeft: ((this.to - min) / (this.range)) * 100,
+      kindOfThumb: '',
     };
 
     this.render(); 
   }
 
   render() {
-    const { left, right } = this.progressData;
+    const { leftThumbShiftFromLeft, rightThumbShiftFromLeft } = this.progressData;
     const wrapper = document.createElement('div');
     wrapper.innerHTML = (
       `<div class="range-slider">
             <span data-element="from">${this.formatValue(this.from)}</span>
             <div class="range-slider__inner">
-                <span data-element="progress" class="range-slider__progress" style="left: ${left}%; right: ${right}%"></span>
-                <span data-element="left" class="range-slider__thumb-left" style="left: ${left}%"></span>
-                <span data-element="right" class="range-slider__thumb-right" style="right: ${right}%"></span>
+                <span data-element="progress" class="range-slider__progress" style="left: ${leftThumbShiftFromLeft}%; right: ${100 - rightThumbShiftFromLeft}%"></span>
+                <span data-element="left-thumb" class="range-slider__thumb-left" style="left: ${leftThumbShiftFromLeft}%"></span>
+                <span data-element="right-thumb" class="range-slider__thumb-right" style="left: ${rightThumbShiftFromLeft}%"></span>
             </div>
             <span data-element="to">${this.formatValue(this.to)}</span>
        </div>`
@@ -72,32 +49,51 @@ export default class DoubleSlider {
     const result = {};
     const elements = this.element.querySelectorAll('[data-element]');
     for (let element of elements) {
-      const name = element.dataset.element;
+      const name = element.dataset.element.match(/(left|right|progress|to|from)/)[0];
       result[name] = element;
     }
     return result;
   }
 
-  update(valueOfDrop) {
-    const { nameOfSide } = this.progressData;
-
-    const target = nameOfSide === 'left' ? this.subElements.from : this.subElements.to;
-    const thumb = this.subElements[nameOfSide];
+  updateElement(shiftFromLeft) {
+    const { kindOfThumb } = this.progressData;
+    const target = kindOfThumb === 'left' ? this.subElements.from : this.subElements.to;
+    const thumb = this.subElements[kindOfThumb];
     const progress = this.subElements.progress;
-    console.log(valueOfDrop);
-    [progress.style[nameOfSide], thumb.style[nameOfSide]] = [`${valueOfDrop}%`, `${valueOfDrop}%`];
-    target.textContent = this.formatValue(this.min + (this.range / 100 * this.progressData[nameOfSide]));
+
+    const shiftOfProgress = kindOfThumb === 'left' ? shiftFromLeft : 100 - shiftFromLeft;
+    const value = kindOfThumb === 'left' ? 'from' : 'to';
+
+    [progress.style[kindOfThumb], thumb.style.left] = [`${shiftOfProgress}%`, `${shiftFromLeft}%`];
+
+    this[value] = this.min + (this.range / 100 * shiftFromLeft);
+    console.log(value);
+
+    target.textContent = this.formatValue(this[value]);
   }
 
   pointerMoveHandler = (event) => {
-    const { nameOfSide } = this.progressData;
+
     const { clientX } = event;
-    const valueOfDrop = this.getValueOfDrop[nameOfSide](this, clientX);
-    if (valueOfDrop === null) {return;}
-    this.update(valueOfDrop);
+    const { leftThumbShiftFromLeft, rightThumbShiftFromLeft, kindOfThumb } = this.progressData;
+    const {widthOfSlider, leftShiftOfSlider} = this;
+
+    const shiftFromLeft = Math.ceil((clientX - leftShiftOfSlider) / widthOfSlider * 100);
+
+    if (kindOfThumb === 'left') {
+      if (shiftFromLeft < 0 || shiftFromLeft > rightThumbShiftFromLeft) {return;}
+      this.progressData.leftThumbShiftFromLeft = shiftFromLeft;
+    }
+    if (kindOfThumb === 'right') {
+      if (shiftFromLeft > 100 || shiftFromLeft < leftThumbShiftFromLeft) {return;}
+      this.progressData.rightThumbShiftFromLeft = shiftFromLeft;
+    }
+
+    this.updateElement(shiftFromLeft);
   }
 
   pointerUpHandler = () => {
+    this.createEventRangeSelect();
     document.removeEventListener('pointerup', this.pointerUpHandler);
     document.removeEventListener('pointermove', this.pointerMoveHandler);
   }
@@ -106,8 +102,8 @@ export default class DoubleSlider {
     event.preventDefault();
     if (event.target === this.subElements.progress) { return; }
 
-    this.progressData.nameOfSide = event.target.dataset.element;
-    
+    this.progressData.kindOfThumb = event.target.dataset.element.match(/(left|right)/)[0];
+
     const widthOfSliderBorder = this.slider.clientLeft;
     this.widthOfSlider = this.slider.getBoundingClientRect().width - widthOfSliderBorder;
     this.leftShiftOfSlider = this.slider.getBoundingClientRect().left;
@@ -115,6 +111,18 @@ export default class DoubleSlider {
     document.addEventListener('pointermove', this.pointerMoveHandler);
     document.addEventListener('pointerup', this.pointerUpHandler);
   }
+
+  createEventRangeSelect() {
+    const { from, to } = this;
+    const event = new CustomEvent("range-select", {
+      bubles: true,
+      detail: {
+        from,
+        to
+      }});
+    this.element.dispatchEvent(event);
+  }
+
   remove() {
     this.element.remove();
   }

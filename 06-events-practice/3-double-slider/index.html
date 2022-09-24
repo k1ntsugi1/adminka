@@ -11,13 +11,9 @@
     import DoubleSlider from './index.js';
 
     const slider = new DoubleSlider({
-      min: 300,
-      max: 800,
-      selected: {
-        from: 400,
-        to: 600
-      },
-      formatValue: value => '$' + value,
+      min: 100,
+      max: 200,
+      formatValue: value => 'USD' + value
     });
 
     root.append(slider.element);
