@@ -69,8 +69,9 @@
         },
         label: 'customers',
       });
+      ordersChart.update(new Date('2020-04-06'), new Date('2020-05-06'));
 
-      orders.append(ordersChart.element);
+      orders.append(ordersChart.element)
       sales.append(salesChart.element);
       customers.append(customersChart.element);
     </script>
