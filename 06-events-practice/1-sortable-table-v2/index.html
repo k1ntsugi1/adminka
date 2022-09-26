@@ -12,43 +12,26 @@
   import data from './products-data.js';
 
   const headerConfig = [
-    {
-      id: 'images',
-      title: 'Image',
-      sortable: false,
-      template: (data = []) => {
-        return `
-          <div class="sortable-table__cell">
-            <img class="sortable-table-image" alt="Image" src="${data[0]?.url}">
-          </div>
-        `;
-      }
-    },
-    {
-      id: 'title',
-      title: 'Name',
-      sortable: true,
-      sortType: 'string'
-    },
-    {
-      id: 'quantity',
-      title: 'Quantity',
-      sortable: true,
-      sortType: 'number'
-    },
-    {
-      id: 'price',
-      title: 'Price',
-      sortable: true,
-      sortType: 'number'
-    },
-    {
-      id: 'sales',
-      title: 'Sales',
-      sortable: true,
-      sortType: 'number'
-    },
-  ];
+  {
+    id: 'title',
+    title: 'Name',
+    sortable: true,
+    sortType: 'string'
+  },
+  {
+    id: 'price',
+    title: 'Price',
+    sortable: true,
+    sortType: 'number'
+  },
+  {
+    id: 'sales',
+    title: 'Sales',
+    sortable: true,
+    sortType: 'number'
+  },
+];
+
 
   const sortableTable = new SortableTable(headerConfig, {
     data,
@@ -59,5 +42,23 @@
   });
 
   root.append(sortableTable.element);
+
+    
+    const { children } = sortableTable.subElements.header;
+    const [title, price] = children;
+
+    const pointerdown = new MouseEvent('pointerdown', {
+      bubbles: true
+    });
+
+    //title.dispatchEvent(pointerdown)
+    price.dispatchEvent(pointerdown);
+
+    // const { body } = sortableTable.subElements;
+    // const firstRow = body.firstElementChild;
+    // const lastRow = body.lastElementChild;
+
+    // console.log(firstRow)
+    // console.log(firstRow.textContent, lastRow.textContent);
 </script>
 </body>

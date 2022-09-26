@@ -10,7 +10,11 @@
   <script type="module">
     import DoubleSlider from './index.js';
 
-    const slider = new DoubleSlider();
+    const slider = new DoubleSlider({
+      min: 100,
+      max: 200,
+      formatValue: value => 'USD' + value
+    });
 
     root.append(slider.element);
   </script>
