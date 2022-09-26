@@ -56,18 +56,14 @@ export default class ColumnChart {
     get elementOfBodyColumnChart() {
       const element = document.createElement('div');
       const bodyOfElement = `
-                  <div class="column-chart ${!this.data.length ? 'column-chart_loading' : ''}" style="--chart-height: ${ColumnChart.maxChartHeight}">
+                  <div class="column-chart column-chart_loading" style="--chart-height: ${ColumnChart.maxChartHeight}">
                       <div class="column-chart__title">
                           Total ${this.title}
                           ${this.linkOfTitle}
                       </div>
                       <div class="column-chart__container">
-                          <div data-element="header" class="column-chart__header">
-                              ${this.getTotalValueOfData()}
-                          </div>
-                          <div data-element="body" class="column-chart__chart">
-                            ${this.getColumnChartBody()}
-                        </div>
+                          <div data-element="header" class="column-chart__header"></div>
+                          <div data-element="body" class="column-chart__chart"></div>
                       </div>
                   </div>
       `;
@@ -83,7 +79,6 @@ export default class ColumnChart {
       } catch (error) {
         throw new Error(error);
       }
-
     }
 
     render() {
