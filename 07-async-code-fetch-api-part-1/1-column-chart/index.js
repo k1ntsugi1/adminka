@@ -3,42 +3,32 @@ import fetchJson from './utils/fetch-json.js';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class ColumnChart {
-    static maxChartHeight = 50;
+    chartHeight = 50;
+    data = []
+    scale = 1
+    totalValueOfData = 0
+    statusOfLoading = 'fulfilled'
 
     constructor({
       label: title = '',
-      range = {
-        from: (new Date()).toISOString(),
-        to: (new Date()).toISOString()
-      },
-      url = `/api/dashboard/${title}`,
       link = '#',
-      formatHeading = item => `${item}`
+      url = `/api/dashboard/${title}`,
+      formatHeading = item => `${item}`,
+      range: {
+        from = new Date(),
+        to = new Date()
+      } = {},
     } = {}) {
-      this.data = [];
       this.formatHeading = formatHeading;
-
-      this.range = range;
+      this.range = {from: from.toISOString(), to: to.toISOString()};
+      
       this.url = new URL(url, BACKEND_URL);
       this.updateURLByRange();
 
       this.title = title;
       this.linkOfTitle = this.getLinkOfTitle(link);
 
-      this.chartHeight = this.constructor.maxChartHeight;
-      this.scale = this.getScale();
-
       this.render();
-    }
-    getScale() {
-      return this.data.length > 0 ? (this.chartHeight / Math.max(...this.data)) : 1;
-    }
-    getTotalValueOfData() {
-      const totalValueOfData = this.data.reduce((acc, num) => {
-        acc += num;
-        return acc;
-      }, 0);
-      return this.formatHeading(totalValueOfData);
     }
     getLinkOfTitle(link) {
       return !link.length
@@ -55,8 +45,8 @@ export default class ColumnChart {
     }
     get elementOfBodyColumnChart() {
       const element = document.createElement('div');
-      const bodyOfElement = `
-                  <div class="column-chart column-chart_loading" style="--chart-height: ${ColumnChart.maxChartHeight}">
+      const bodyOfElement = (
+        `<div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
                       <div class="column-chart__title">
                           Total ${this.title}
                           ${this.linkOfTitle}
@@ -65,28 +55,70 @@ export default class ColumnChart {
                           <div data-element="header" class="column-chart__header"></div>
                           <div data-element="body" class="column-chart__chart"></div>
                       </div>
-                  </div>
-      `;
+                  </div>`
+      );
       element.innerHTML = bodyOfElement;
       return element.firstElementChild;
     }
 
-    async getData() {
+    getScale() {
+      return this.data.length > 0 ? (this.chartHeight / Math.max(...this.data)) : 1;
+    }
+    getTotalValueOfData() {
+      const totalValueOfData = this.data.reduce((acc, num) => {
+        acc += num;
+        return acc;
+      }, 0);
+      return this.formatHeading(totalValueOfData);
+    }
+
+    updateProperties() {
+      this.scale = this.getScale();
+      this.totalValueOfData = this.getTotalValueOfData();
+    }
+
+    updateURLByRange() {
+      this.url.searchParams.set('from', this.range.from);
+      this.url.searchParams.set('to', this.range.to);
+    }
+
+    updateElement() {
+      const { header, body } = this.subElements;
+      header.textContent = this.getTotalValueOfData();
+      body.innerHTML = this.getColumnChartBody();
+    }
+    
+    switchStatusOfLoading() {
+      const switcherStatusOfLoading = {
+        pending: () => {
+          this.element.classList.remove('column-chart_loading');
+          this.statusOfLoading = 'fulfilled';
+        },
+        fulfilled: () => {
+          this.element.classList.add('column-chart_loading');
+          this.statusOfLoading = 'pending';
+        },
+      };
+      switcherStatusOfLoading[this.statusOfLoading]();
+    }
+
+    async updateData() {
       try {
+        this.switchStatusOfLoading();
+        this.updateURLByRange();
+
         const response = await fetch(this.url.toString());
-        const JSONresponse = await response.json();
-        return JSONresponse;
+        const JSONData = await response.json();
+        this.data = Object.values(JSONData);
+
+        this.updateProperties();
+        this.switchStatusOfLoading();
+
+        return JSONData;
       } catch (error) {
-        throw new Error(error);
+        alert(error);
       }
     }
-
-    render() {
-      this.element = this.elementOfBodyColumnChart;
-      this.subElements = this.getSubElements();
-      this.update();
-    }
-
 
     getSubElements() {
       const result = {};
@@ -98,27 +130,22 @@ export default class ColumnChart {
       return result;
     }
 
-    updateURLByRange() {
-      this.url.searchParams.set('from', this.range.from);
-      this.url.searchParams.set('to', this.range.to);
+    async render() {
+      this.element = this.elementOfBodyColumnChart;
+      this.subElements = this.getSubElements();
+
+      await this.updateData();
+      this.updateElement();
     }
 
+
     async update(from = this.range.from, to = this.range.to) {
-      const { header, body } = this.subElements;
       this.range = { ...this.range, ...{from: from.toISOString(), to: to.toISOString()} };
-      this.updateURLByRange();
+ 
+      const data = await this.updateData();
+      this.updateElement();
 
-      this.element.classList.add('column-chart_loading');
-      const JSONData = await this.getData();
-
-      this.data = Object.values(JSONData);
-      this.scale = this.getScale();
-
-      header.textContent = this.getTotalValueOfData();
-      body.innerHTML = this.getColumnChartBody();
-
-      this.element.classList.remove('column-chart_loading');
-      return JSONData;
+      return data;
     }
     remove() {
         this.element?.remove();

@@ -55,9 +55,9 @@
   ];
 
   const sortableTable = new SortableTable(header, {
-    url: 'api/rest/products'
+    url: 'api/rest/products',
+    isSortLocally: true
   });
-
   root.append(sortableTable.element);
 </script>
 </body>

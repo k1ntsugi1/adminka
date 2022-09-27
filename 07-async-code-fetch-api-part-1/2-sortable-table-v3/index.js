@@ -4,25 +4,35 @@ const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class SortableTable {
   subElements = {}
+  statusOfLoading = 'fulfilled'
+  data = []
 
   constructor(headerConfig, { 
-    // range = {
-    //   from: (new Date()).toISOString(),
-    //   to: (new Date()).toISOString()
-    // },
     url = `/api/dashboard/bestsellers`,
     sorted: {
       id: field = headerConfig.find(cell => cell.sortable).id,
       order = 'asc'
     } = {},
+    // range: {
+    //   from = (new Date('2022-08-28')).toISOString(),
+    //   to = (new Date('2022-09-27')).toISOString() 
+    // } = {},
     isSortLocally = false,
   } = {}) {
-    this.data = [];
-    // this.range = range;
-    this.paramOfSort = {field, order, start: 0, end: 30 };
 
+    this.paramOfSort = {
+      field,
+      order,
+      start: 0,
+      end: 30,
+      // from,
+      // to
+    };
     this.isSortLocally = isSortLocally;
     this.headerConfig = headerConfig;
+
+    this.cells = this.headerConfig.map(item => item.id);
+    this.url = new URL(url, BACKEND_URL);
 
     this.templates = this.headerConfig.reduce((acc, headerItem) => {
       if (headerItem.template) {
@@ -31,10 +41,6 @@ export default class SortableTable {
       }
       return acc;
     }, {});
-
-    this.cells = this.headerConfig.map(item => item.id);
- 
-    this.url = new URL(url, BACKEND_URL);
 
     this.render();
   }
@@ -46,6 +52,24 @@ export default class SortableTable {
       </span>`
     );
   }
+
+  getLoadingLine() {
+    return (
+      `<div data-elem="loading" class="loading-line sortable-table__loading-line"></div>`
+    );
+  }
+
+  getMessageForEmptyDataOfLoading() {
+    return (
+      `<div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
+        <div>
+          <p>No products satisfies your filter criteria</p>
+          <button type="button" class="button-primary-outline">Reset all filters</button>
+        </div>
+      </div>`
+    );
+  }
+
   getCellOfTableHeader({ title, sortable, id }) {
     const isSortedCell = id === this.paramOfSort.field;
     const [dataOrder, elementOfSort] = isSortedCell 
@@ -82,16 +106,17 @@ export default class SortableTable {
     const elementsOfTableBody = this.data.map((rowItem => this.getRowOfTableBody(rowItem))).join('');
     return elementsOfTableBody;
   }
-  
+
   getTableElement() {
-    const wrapper = document.createElement('div'); // класс загрузки чекни
+    const wrapper = document.createElement('div');
     wrapper.innerHTML = (
       `<div class="sortable-table sortable-table_loading">
         <div data-element="header" class="sortable-table__header sortable-table__row">
           ${this.getTableHeader()}
         </div>
         <div data-element="body" class="sortable-table__body"></div>
-        <div data-elem="loading" class="loading-line sortable-table__loading-line"></div>
+        ${this.getLoadingLine()}
+        ${this.getMessageForEmptyDataOfLoading()}
       </div>`
     );
     return wrapper.firstElementChild;
@@ -99,12 +124,13 @@ export default class SortableTable {
 
   updateElement() {
     const { body, header } = this.subElements;
-    body.innerHTML = this.getTableBody();
     header.innerHTML = this.getTableHeader();
+    body.innerHTML = this.getTableBody();
   }
 
-  updateQueryStringOfURL() {
-    const { field, order, start, end } = this.paramOfSort;
+  updateQueryStringOfURL({ from, to, field, order, start, end } = this.paramOfSort) {
+    // this.url.searchParams.set('from', from);
+    // this.url.searchParams.set('to', to);
     this.url.searchParams.set('_sort', field);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);
@@ -122,7 +148,7 @@ export default class SortableTable {
       } 
     } = sortableTarget;
     if (this.paramOfSort.field === field) {
-      order = this.paramOfSort.order === 'asc' ? 'desc' : 'asc'; // create toggler!
+      order = this.paramOfSort.order === 'asc' ? 'desc' : 'asc';
     }
     this.paramOfSort = {...this.paramOfSort, ...{field, order} };
     this.sort();
@@ -140,20 +166,31 @@ export default class SortableTable {
 
     if (scrolled > limitOfScrolling && this.statusOfLoading === 'fulfilled') {
       this.paramOfSort.end = this.paramOfSort.end + 30;
-      this.sort();
+      this.getDataFromServer().then(data => { 
+        this.data = data;
+        this.updateElement();
+      }); 
     }
   };
 
+  resetParamsOfSortHandler = (startParams) => async () => {
+    this.paramOfSort = startParams;
+    this.data = await this.getDataFromServer();
+    this.updateElement();
+  }
+
   addEventListeners() {
-    const { header } = this.subElements;
+    const { header, emptyPlaceholder} = this.subElements;
     header.addEventListener('pointerdown', this.sortByHeaderHandler);
     document.addEventListener('scroll', this.scrollHandler);
+    emptyPlaceholder.addEventListener('click', this.resetParamsOfSortHandler({...this.paramOfSort}));
   }
 
   removeEventListeners() {
-    const { header } = this.subElements; 
+    const { header, emptyPlaceholder } = this.subElements; 
     header.removeEventListener('pointerdown', this.sortByHeaderHandler);
     document.removeEventListener('scroll', this.scrollBodyOfTableHandler);
+    emptyPlaceholder.removeEventListener('click', this.resetParamsOfSortHandler({...this.paramOfSort}));
   }
 
   getSubElements() {
@@ -171,20 +208,45 @@ export default class SortableTable {
     this.subElements = this.getSubElements();
     this.addEventListeners();
 
-    this.data = await this.sortOnServer();
+    this.data = await this.getDataFromServer();
     this.updateElement();
   }
 
+  switchStatusOfLoading() {
+    const switcherStatusOfLoading = {
+      pending: () => {
+        this.element.classList.remove('sortable-table_loading');
+        this.statusOfLoading = 'fulfilled';
+      },
+      fulfilledWithEmptyValue: () => {
+        this.element.classList.remove('sortable-table_loading');
+        this.element.classList.add('sortable-table_empty');
+        this.statusOfLoading = 'fulfilled';
+      },
+      fulfilled: () => {
+        this.element.classList.add('sortable-table_loading');
+        this.element.classList.remove('sortable-table_empty');
+        this.statusOfLoading = 'pending';
+      },
+    };
+    switcherStatusOfLoading[this.statusOfLoading]();
+  }
+
+  async getDataFromServer() {
+    this.switchStatusOfLoading();
+    this.updateQueryStringOfURL();
+
+    const response = await fetch(this.url.toString());
+    const sortedata = await response.json();
+
+    if (!sortedata.length) { this.statusOfLoading = 'fulfilledWithEmptyValue';}
+    this.switchStatusOfLoading();
+
+    return sortedata;
+  }
+
   async sortOnServer() {
-    try {
-      this.updateQueryStringOfURL();
-      console.log(this.paramOfSort)
-      const response = await fetch(this.url.toString());
-      const sortedata = await response.json();
-      return sortedata;
-    } catch (error) {
-      throw new Error(error);
-    }
+    return await this.getDataFromServer();
   }
 
   sortOnClient() {
@@ -204,18 +266,18 @@ export default class SortableTable {
   }
 
   async sort() {
-    this.element.classList.add('sortable-table_loading');
-    this.statusOfLoading = 'pending';
-
     if (this.isSortLocally) {
       this.data = this.sortOnClient();
     } else {
-      const response = await this.sortOnServer();
-      this.data = response;
+      this.data = await this.sortOnServer();
     }
     this.updateElement();
-    this.statusOfLoading = 'fulfilled';
-    this.element.classList.remove('sortable-table_loading');
+  }
+
+  async update(from = this.paramOfSort.from, to = this.paramOfSort.to) {
+    this.paramOfSort = {...this.paramOfSort, ...{from: from.toISOString(), to: to.toISOString()}};
+    this.data = await this.getDataFromServer();
+    this.updateElement();
   }
 
   remove() {
