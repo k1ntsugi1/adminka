@@ -79,8 +79,8 @@ export default class SortableTable {
 
   getSubElements() {
     const result = {};
-    const elements = this.element.querySelectorAll('div[data-element]');
-    for (let subElement of elements) {
+    const subElements = this.element.querySelectorAll('div[data-element]');
+    for (const subElement of subElements) {
       const name = subElement.dataset.element;
       result[name] = subElement;
     }
@@ -97,7 +97,7 @@ export default class SortableTable {
     /// 
   }
 
-  async getSortedDataRemotely({ field, order } = this.paramOfSort) { // async operation
+  async getSortedDataRemotely({ field, order } = this.paramOfSort) {
     throw new Error('I dont know url :(');
   }
 
@@ -120,13 +120,12 @@ export default class SortableTable {
     this.sort();
   }
 
-  sortByHeaderTitleHandler = async (event) => { //<------here changed | without async status of tests - without error
-    console.log(event.target)
+  sortByHeaderTitleHandler = async (event) => { 
     const sortableTarget = event.target.closest('div[data-sortable="true"]');
     if (!sortableTarget) {return;}
     let { dataset: 
       { 
-        order = 'asc', // <----------here changed | with "desc" status of tests - without error  
+        order = 'asc',  
         id: field
       } 
     } = sortableTarget;
@@ -136,14 +135,13 @@ export default class SortableTable {
     this.paramOfSort = { field, order };
     this.data = await this.kindOfSort === 'locally' 
       ? this.getSortedDataLocally() 
-      : this.getSortedDataRemotely();// operation is async
+      : this.getSortedDataRemotely();
 
     this.sort();
   }
 
   addEventListeners() {
     const { header } = this.subElements;
-    // later i should add userEvent for userParamsOfSort
     header.addEventListener('pointerdown', this.sortByHeaderTitleHandler);
   }
 
@@ -158,7 +156,6 @@ export default class SortableTable {
     header.innerHTML = this.getElementsOfTableHeader();
   }
   remove() {
-    //this.removeEventListeners(); // странно, но тесты падают, будто элемент уже удален UPD -> ассинхронная операция удаления похоже что
     this.element = null;
     this.subElements = {};
   }
