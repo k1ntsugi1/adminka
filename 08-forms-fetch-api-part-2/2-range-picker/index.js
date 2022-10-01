@@ -158,11 +158,18 @@ export default class RangePicker {
     }
 
     this.rangeSelected = this.rangeSelected === true ? false : true;
-    if (this.rangeSelected) { input.innerHTML = this.getRangeInput();}
+
+    if (this.rangeSelected) { 
+      input.innerHTML = this.getRangeInput();
+      this.element.dispatchEvent(new CustomEvent('date-select'), {
+        bubles: true,
+        detail: this.range.from,
+      });
+    }
   }
 
   selectorHandler = (event) => {
-    const { selector, input } = this.subElements;
+    const { selector } = this.subElements;
 
     const target = event.target; 
     const {element: datasetElemet, value: datasetValue} = target.dataset; 
