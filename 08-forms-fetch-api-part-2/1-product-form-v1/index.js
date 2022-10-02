@@ -330,7 +330,7 @@ export default class ProductForm {
 
   getInputIMGLoader() {
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = `<input name="imageLoader" type="file" accept="image/*" hidden/>`
+    wrapper.innerHTML = `<input name="imageLoader" type="file" accept="image/*" hidden/>`;
     return wrapper.firstElementChild;
   }
 
