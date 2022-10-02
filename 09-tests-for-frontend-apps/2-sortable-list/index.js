@@ -46,7 +46,8 @@ export default class SortableList {
     this.topShift = element.offsetTop + element.offsetHeight / 2;
   }
 
-  handlerDrop = () => {
+  handlerDrop = (event) => {
+    event.preventDefault();
     this.element.replaceChild(this.sortableItem, this.placeholder);
     this.sortableItem.classList.remove('sortable-list__item_dragging');
     this.deleteProps(this.sortableItem, ['left', 'top', 'width', 'height']);
@@ -56,6 +57,7 @@ export default class SortableList {
   }
 
   handlerMove = (event) => {
+    event.preventDefault();
     const { clientX, clientY } = event;
     const left = clientX - this.leftShift;
     const top = clientY - this.topShift;
@@ -86,6 +88,7 @@ export default class SortableList {
   }
 
   handlerDrag = (event) => {
+    event.preventDefault();
     if (!event.target.closest('[data-grab-handle]')) { return; }
 
     this.sortableItem = event.target.closest('[data-element="sortableItem"]');
@@ -109,6 +112,7 @@ export default class SortableList {
   }
 
   handlerRemove = (event) => {
+    event.preventDefault();
     const target = event.target;
     if (!target.closest('[data-delete-handle]')) {return;}
     target.closest('[data-element="sortableItem"]').remove();
