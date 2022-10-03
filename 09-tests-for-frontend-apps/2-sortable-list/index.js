@@ -1,19 +1,21 @@
 export default class SortableList {
-  constructor({items}) {
-    this.items = this.addClasses(items);
-    this.render();
-  }
-
-  addClasses(items) {
+  
+  static addClassesOfItems(items) {
     return items.map((element) => {
       element.classList.add('sortable-list__item');
       element.setAttribute('data-element', 'sortableItem');
       return element;
     });
   }
+  
+  constructor({items}, parentContainer) {
+    this.items = SortableList.addClassesOfItems(items);
+    this.parentContainer = parentContainer;
+    this.render();
+  }
 
   getElement() {
-    const element = document.createElement('div');
+    const element = this.parentContainer ? this.parentContainer : document.createElement('ul');
     element.classList.add('sortable-list');
     element.setAttribute('data-element', 'sortableList');
     element.append(...this.items);
@@ -50,7 +52,7 @@ export default class SortableList {
     event.preventDefault();
     this.element.replaceChild(this.sortableItem, this.placeholder);
     this.sortableItem.classList.remove('sortable-list__item_dragging');
-    this.deleteProps(this.sortableItem, ['left', 'top', 'width', 'height']);
+    this.deleteProps(this.sortableItem, ['left', 'top', 'width', 'height', 'zIndex']);
 
     document.removeEventListener('pointermove', this.handlerMove);
     document.removeEventListener('pointerup', this.handlerDrop);

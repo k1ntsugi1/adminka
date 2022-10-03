@@ -21,7 +21,6 @@ export default class ProductForm {
     } = {}
   ) {
     this.productId = productId;
-    this.statusForm = this.productId ? 'updating' : 'saving';
   
     this.urls = {
       categories: new URL(categoriesPath, BACKEND_URL),
@@ -255,7 +254,7 @@ export default class ProductForm {
   }
 
   isValidUrl(nameOfUrl) {
-    const validURLs = this.statusForm === 'updating' ? ['product', 'categories'] : ['categories'];
+    const validURLs = this.productId ? ['product', 'categories'] : ['categories'];
     return validURLs.includes(nameOfUrl);
   }
 
@@ -368,7 +367,7 @@ export default class ProductForm {
 
     const formData = this.getFormatedFormData();
 
-    const [nameOfEvent, method] = this.statusForm === 'updating' 
+    const [nameOfEvent, method] = this.productId 
       ? ['product-updated', 'PATCH'] 
       : ['product-saved', 'PUT'];
 

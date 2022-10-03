@@ -22,7 +22,6 @@ export default class ProductForm {
     } = {}
   ) {
     this.productId = productId;
-    this.statusForm = this.productId ? 'updating' : 'saving';
   
     this.urls = {
       categories: new URL(categoriesPath, BACKEND_URL),
@@ -31,7 +30,7 @@ export default class ProductForm {
     };
   }
 
-  setSearchParamsOfURL() {
+  setSearchParamsOfURLs() {
     const {categories, product} = this.urls;
 
     categories.searchParams.set('_sort', 'weigh');
@@ -40,7 +39,7 @@ export default class ProductForm {
     product.searchParams.set('id', this.productId);
   }
 
-  deleteSearchParamsOfURL() {
+  deleteSearchParamsOfURLs() {
     const {categories, product} = this.urls;
 
     categories.searchParams.delete('_sort');
@@ -50,7 +49,6 @@ export default class ProductForm {
   }
 
   getTitle() {
-    const { title = '' } = this.data.product ?? {};
     return (
       `<fieldset>
         <label class="form-label">Название товара</label>
@@ -60,14 +58,13 @@ export default class ProductForm {
                name="title"
                class="form-control"
                placeholder="Название товара"
-               value=${title}
+               value=""
                >
       </fieldset>`
     );
   }
 
   getDescription() {
-    const { description = '' } = this.data.product ?? {};
     return (
       `<label class="form-label">Описание</label>
        <textarea required="" 
@@ -75,7 +72,8 @@ export default class ProductForm {
                  name="description" 
                  data-element="productDescription" 
                  placeholder="Описание товара"
-                 >${escapeHtml(description)}</textarea>`
+                 value=""
+                 ></textarea>`
     );
   }
 
@@ -83,26 +81,25 @@ export default class ProductForm {
     const { source, url } = image;
     const wrapper = document.createElement('div');
     wrapper.innerHTML =
-      `<li class="products-edit__imagelist-item sortable-list__item" style="">
-      <input type="hidden" name="url" value="https://i.imgur.com/MWorX2R.jpg">
-      <input type="hidden" name="source" value="${source}">
-      <span>
-        <img src="icon-grab.svg" data-grab-handle="" alt="grab">
-        <img class="sortable-table__cell-img" alt="Image" src="${url}">
-        <span>${source}</span>
-      </span>
-      <button type="button">
-        <img src="icon-trash.svg" data-delete-handle="" alt="delete">
-      </button>
-    </li>`;
+      `<li class="products-edit__imagelist-item">
+        <input type="hidden" name="url" value="${url}">
+        <input type="hidden" name="source" value="${source}">
+        <span>
+          <img src="icon-grab.svg" data-grab-handle="" alt="grab">
+          <img class="sortable-table__cell-img" alt="Image" src="${url}">
+          <span>${source}</span>
+        </span>
+        <button type="button">
+          <img src="icon-trash.svg" data-delete-handle="" alt="delete">
+        </button>
+      </li>`;
     return wrapper.firstElementChild;
   }
 
   getImages() {
     return (
       ` <label class="form-label">Фото</label>
-        <div data-element="imageListContainer">
-        </div>
+        <div data-element="imageListContainer"></div>
         <button type="button" name="uploadImage" class="button-primary-outline">
           <span>Загрузить</span>
         </button>`
@@ -133,7 +130,6 @@ export default class ProductForm {
   }
 
   getPrice() {
-    const { price = '' } = this.data.product ?? {};
     return (
       `<fieldset>
         <label class="form-label">Цена ($)</label>
@@ -142,13 +138,12 @@ export default class ProductForm {
                name="price"
                class="form-control"
                placeholder="100"
-               value=${price}>
+               value="">
       </fieldset>`
     );
   }
 
   getDiscount() {
-    const { discount = ''} = this.data.product ?? {};
     return (
       `<fieldset>
         <label class="form-label">Скидка ($)</label>
@@ -157,13 +152,12 @@ export default class ProductForm {
                name="discount" 
                class="form-control" 
                placeholder="0"
-               value=${discount}>
+               value="">
       </fieldset>`
     );
   }
 
   getQuantity() {
-    const { quantity = ''} = this.data.product ?? {};
     return (
       `<label class="form-label">Количество</label>
        <input required="" 
@@ -171,15 +165,14 @@ export default class ProductForm {
               class="form-control"
               name="quantity"
               placeholder="1"
-              value=${quantity}>`
+              value="">`
     );
   }
 
   getStatus() {
-    const { status = 1 } = this.data.product ?? {};
     return (
       `<label class="form-label">Статус</label>
-        <select class="form-control" name="status" value=${status}>
+        <select class="form-control" name="status" value=''>
           <option value="1">Активен</option>
           <option value="0">Неактивен</option>
         </select>`
@@ -253,30 +246,29 @@ export default class ProductForm {
     }
   }
 
-  isValidUrl(nameOfUrl) {
-    const validURLs = this.statusForm === 'updating' ? ['product', 'categories'] : ['categories'];
+  isRequiredURL(nameOfUrl) {
+    const validURLs = this.productId ? ['product', 'categories'] : ['categories'];
     return validURLs.includes(nameOfUrl);
   }
 
   async getData() {
-    this.setSearchParamsOfURL();
-    const namesOfUrls = Object.keys(this.urls);
-    const validUrls = Object.values(this.urls)
-      .filter((_, index) => this.isValidUrl(namesOfUrls[index]));
+    this.setSearchParamsOfURLs();
+
+    const namesOfURLs = Object.keys(this.urls);
+    const requiredURLs = Object.values(this.urls)
+      .filter((_, index) => this.isRequiredURL(namesOfURLs[index]));
     
-    const responses = validUrls.map(this.fetchUnmutableRequest);
+    const responses = requiredURLs.map(this.fetchUnmutableRequest);
+
     const dataOfResponses = await Promise.all(responses);
     
     const entriesOfResponses = dataOfResponses.map((data, index) => {
-      const nameOfData = namesOfUrls[index];
-      if (nameOfData === 'product') {
-        data = data[0];
-        this.images = data.images ?? [];
-      }
+      const nameOfData = namesOfURLs[index];
+      if (nameOfData === 'product') {this.images = data[0].images ?? [];}
       return [nameOfData, data];
     });
 
-    this.deleteSearchParamsOfURL();
+    this.deleteSearchParamsOfURLs();
     return Object.fromEntries(entriesOfResponses);
   }
 
@@ -291,6 +283,7 @@ export default class ProductForm {
     formData.delete('url');
     formData.delete('source');
     formData.set('id', formData.get('title'));
+    
 
     for (const [key, value] of formData.entries()) {
       formatedFormData[key] = keysWithNumberValue.includes(key) ? Number(value) : value;
@@ -334,14 +327,15 @@ export default class ProductForm {
   }
 
   loadImgHander = () => {
-    const {productForm, imageList} = this.subElements;
+    const {productForm, sortableList} = this.subElements;
 
     const inputIMGLoader = this.getInputIMGLoader();
 
     inputIMGLoader.onchange = async () => {
+
       const formData = new FormData();
       const file = inputIMGLoader.files[0];
-      formData.append('image', file);
+      formData.append(inputIMGLoader.name, file);
 
       const link = await this.postImage(formData);
       if (!link) {
@@ -351,8 +345,7 @@ export default class ProductForm {
 
       const image = {source: file.name, src: link};
       this.images.push(image);
-
-      imageList.insertAdjacentHTML('beforeend', this.getImage(image));
+      sortableList.append(...SortableList.addClassesOfItems([this.getImage(image)]));
 
       inputIMGLoader.remove();
     };
@@ -367,7 +360,7 @@ export default class ProductForm {
 
     const formData = this.getFormatedFormData();
 
-    const [nameOfEvent, method] = this.statusForm === 'updating' 
+    const [nameOfEvent, method] = this.productId 
       ? ['product-updated', 'PATCH'] 
       : ['product-saved', 'PUT'];
 
@@ -379,13 +372,14 @@ export default class ProductForm {
     this.fetchMutableRequest(method, formData);
   }
 
-  handlerRemove = (event) => {
+  removeListItemHandler = (event) => {
     event.preventDefault();
     const target = event.target;
 
     if (!target.closest('[data-delete-handle]')) {return;}
-    const wrapper = target.closest('[data-element="sortableItem"]');
-    const inputs = wrapper.querySelectorAll('input');
+
+    const listItem = target.closest('[data-element="sortableItem"]');
+    const inputs = listItem.querySelectorAll('input');
     const imageForRemoving = {};
 
     for (const input of inputs) {
@@ -409,16 +403,36 @@ export default class ProductForm {
     const { productForm, imageListContainer } = this.subElements;
     productForm.addEventListener('submit', this.submitHandler);
     productForm.uploadImage.addEventListener('click', this.loadImgHander);
-    imageListContainer.addEventListener('pointerdown', this.handlerRemove);
+    imageListContainer.addEventListener('pointerdown', this.removeListItemHandler);
+  }
+
+  createProduct() {
+    const namesForFilling = ['title', 'description', 'price', 'discount', 'quantity', 'status'];
+
+    const productForm = this.element.querySelector('[data-element="productForm"]');
+
+    Array.from(productForm.elements).forEach((element) => {
+      const name = element.name;
+      if (namesForFilling.includes(name)) {
+        productForm[name].value = this.data.product[0][name] ?? '';
+      }
+    });
+  
+  }
+
+  createImages() {
+    const imageListContainer = this.element.querySelector('[data-element="imageListContainer"]');
+    const sortableList = new SortableList({items: this.images.map(this.getImage)});
+    imageListContainer.append(sortableList.element);
   }
 
   async render() {
     this.data = await this.getData();
     this.element = this.getElement();
+
+    if (this.productId) { this.createProduct(); }
+    this.createImages();
     this.setSubElements();
-    const { imageListContainer } = this.subElements;
-    const list = new SortableList({items: this.images.map(this.getImage)});
-    imageListContainer.append(list.element);
     this.addEventListeners();
   }
 
