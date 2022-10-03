@@ -79,15 +79,18 @@ export default class ProductForm {
 
   getImage(image) {
     const { source, url } = image;
+    const escapedSource = escapeHtml(source);
+    const escapedUrl = escapeHtml(url);
+
     const wrapper = document.createElement('div');
     wrapper.innerHTML =
       `<li class="products-edit__imagelist-item">
-        <input type="hidden" name="url" value="${url}">
-        <input type="hidden" name="source" value="${source}">
+        <input type="hidden" name="url" value="${escapedUrl}">
+        <input type="hidden" name="source" value="${escapedSource}">
         <span>
           <img src="icon-grab.svg" data-grab-handle="" alt="grab">
-          <img class="sortable-table__cell-img" alt="Image" src="${url}">
-          <span>${source}</span>
+          <img class="sortable-table__cell-img" alt="Image" src="${escapedUrl}">
+          <span>${escapedSource}</span>
         </span>
         <button type="button">
           <img src="icon-trash.svg" data-delete-handle="" alt="delete">
@@ -112,7 +115,7 @@ export default class ProductForm {
     const options = subcategories.map((subcategory) => {
       const {id, title: titleOfSubcat} = subcategory;
       const text = `${escapeHtml(`${titleOfCat} > ${titleOfSubcat}`)}`;
-      return `<option value="${id}">${text}</option>`;
+      return `<option value="${escapeHtml(id)}">${text}</option>`;
     });
 
     return options.join('');
@@ -222,27 +225,29 @@ export default class ProductForm {
     try {
       const response = await fetch(url.toString());
       if (response.ok) {return await response.json();} 
-      throw new Error('server Error');
-
+      
+      throw new Error('error at server (unmutable request)');
     } catch (error) {
-      console.error('ERROR', error);
-      return [{}];
+      console.error(error);
+      throw new Error(error);
     }
   }
 
   async fetchMutableRequest(method, body) {
     const { product } = this.urls;
     try {
-      const response = fetch(product.toString(), {
+      const response = await fetch(product.toString(), {
         method,
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify(body)
       });
+
       if (!response.ok) {throw new Error('error at server (mutable request)');}
     } catch (error) {
       console.error(error);
+      throw new Error(error);
     }
   }
 
@@ -282,8 +287,9 @@ export default class ProductForm {
     const formData = new FormData(productForm);
     formData.delete('url');
     formData.delete('source');
-    formData.set('id', formData.get('title'));
-    
+
+    const id = this.productId ? this.productId : formData.get('title');
+    formData.set('id', id);
 
     for (const [key, value] of formData.entries()) {
       formatedFormData[key] = keysWithNumberValue.includes(key) ? Number(value) : value;
@@ -309,10 +315,12 @@ export default class ProductForm {
           Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,
         },
         body: formData,
+        referrer: ''
       });
+      const responseJSON = await response.json();
 
       this.toggleStatusOfLoadingImage();
-      return response?.data?.link ?? null;
+      return responseJSON.data.link;
 
     } catch (error) {
       console.error(error);
@@ -322,7 +330,7 @@ export default class ProductForm {
 
   getInputIMGLoader() {
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = `<input name="imageLoader" type="file" accept="image/*" hidden/>`;
+    wrapper.innerHTML = `<input name="image" type="file" accept="image/*" hidden/>`;
     return wrapper.firstElementChild;
   }
 
@@ -338,12 +346,13 @@ export default class ProductForm {
       formData.append(inputIMGLoader.name, file);
 
       const link = await this.postImage(formData);
+
       if (!link) {
         inputIMGLoader.remove();
         return;
       }
 
-      const image = {source: file.name, src: link};
+      const image = {source: file.name, url: link};
       this.images.push(image);
       sortableList.append(...SortableList.addClassesOfItems([this.getImage(image)]));
 
@@ -414,7 +423,8 @@ export default class ProductForm {
     Array.from(productForm.elements).forEach((element) => {
       const name = element.name;
       if (namesForFilling.includes(name)) {
-        productForm[name].value = this.data.product[0][name] ?? '';
+        const value = this.data.product[0][name];
+        productForm[name].value = value;
       }
     });
   
