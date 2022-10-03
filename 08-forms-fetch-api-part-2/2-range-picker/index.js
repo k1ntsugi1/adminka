@@ -9,10 +9,7 @@ export default class RangePicker {
     to = new Date(2020, 10, 5)
   } = {}) {
 
-    this.range = {
-      from,
-      to,
-    };
+    this.range = [from, to];
 
     const firstDate = new Date(to);
     const secondDate = new Date(to);
@@ -29,7 +26,7 @@ export default class RangePicker {
   }
 
   getRangeInput() {
-    const { from, to } = this.range;
+    const [from, to] = this.range;
     const options = { year: 'numeric', month: 'numeric', day: 'numeric'};
     return (
       ` <span data-element="from">${from.toLocaleDateString('ru', options)}</span> -
@@ -38,7 +35,7 @@ export default class RangePicker {
   }
 
   getBtnOfRangeCell(date) {
-    const { from, to } = this.range;
+    const [from, to] = this.range;
     const classNames = ['rangepicker__cell'];
   
     const dateInMillSec = date.getTime();
@@ -148,13 +145,11 @@ export default class RangePicker {
   switchRange(newDate) {
     const { input } = this.subElements;
 
-    const key = this.rangeSelected ? 'from' : 'to';
-    this.range[key] = newDate;
+    const index = this.rangeSelected ? 0 : 1;
+    this.range[index] = newDate;
 
-    if (this.range.from.getTime() > newDate.getTime()) {
-      const container = this.range.from;
-      this.range.from = this.range.to;
-      this.range.to = container;
+    if (this.range[0].getTime() > newDate.getTime()) {
+      this.range = this.range.reverse();
     }
 
     this.rangeSelected = this.rangeSelected === true ? false : true;
@@ -163,8 +158,9 @@ export default class RangePicker {
       input.innerHTML = this.getRangeInput();
       this.element.dispatchEvent(new CustomEvent('date-select'), {
         bubles: true,
-        detail: this.range.from,
+        detail: this.range,
       });
+      this.closeRangePicker();
     }
   }
 
@@ -174,7 +170,7 @@ export default class RangePicker {
     const target = event.target; 
     const {element: datasetElemet, value: datasetValue} = target.dataset; 
 
-    if (datasetElemet) {this.switchShownDate(datasetElemet);}
+    if (datasetElemet && datasetElemet.includes('control')) {this.switchShownDate(datasetElemet);}
     if (datasetValue) {this.switchRange(new Date(datasetValue));}
 
     selector.innerHTML = this.getSelector();
