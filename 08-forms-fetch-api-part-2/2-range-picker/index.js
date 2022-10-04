@@ -5,8 +5,8 @@ export default class RangePicker {
   isOpenedRangePicker = false
 
   constructor({
-    from = new Date(2019, 9, 2),
-    to = new Date(2020, 10, 5)
+    from = new Date(),
+    to = new Date()
   } = {}) {
 
     this.range = [from, to];
@@ -40,14 +40,13 @@ export default class RangePicker {
   
     const dateInMillSec = date.getTime();
     const fromInMillSec = from.getTime();
-
-    if (dateInMillSec === fromInMillSec) {classNames.push('rangepicker__selected-from');}
+    
+    if (dateInMillSec === fromInMillSec) {classNames.push('rangepicker__selected-fromadfadsfasdf');}
     if (this.rangeSelected) {
       const toInMillSec = to.getTime();
       if (dateInMillSec === toInMillSec) {classNames.push('rangepicker__selected-to');}
       if (dateInMillSec > fromInMillSec && dateInMillSec < toInMillSec) {classNames.push('rangepicker__selected-between');}
     }
-    
     return (
       `<button type="button" 
                class="${classNames.join(' ')}"
@@ -156,10 +155,10 @@ export default class RangePicker {
 
     if (this.rangeSelected) { 
       input.innerHTML = this.getRangeInput();
-      this.element.dispatchEvent(new CustomEvent('date-select'), {
+      this.element.dispatchEvent(new CustomEvent('date-select', {
         bubles: true,
         detail: this.range,
-      });
+      }));
       this.closeRangePicker();
     }
   }

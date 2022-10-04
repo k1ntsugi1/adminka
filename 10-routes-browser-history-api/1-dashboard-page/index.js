@@ -1,4 +1,4 @@
-import RangePicker from '../../08-forms-fetch-api-part-2/2-range-picker/index.js';
+import RangePicker from './components/range-picker/src/index.js';
 import SortableTable from '../../07-async-code-fetch-api-part-1/2-sortable-table-v3/index.js';
 import ColumnChart from '../../07-async-code-fetch-api-part-1/1-column-chart/index.js';
 import Tooltip from '../../06-events-practice/2-tooltip/index.js';
@@ -6,74 +6,39 @@ import Tooltip from '../../06-events-practice/2-tooltip/index.js';
 import header from './bestsellers-header.js';
 
 
+const firstDate = new Date();
+const secondDate = new Date();
+
+const monthOfSecondDate = secondDate.getMonth();
+firstDate.setMonth(monthOfSecondDate - 1);
+
+
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
-export default class Page {
-  static currentPage
-
+export default class DashboardPage {
   subElements = {}
-  template = {};
-  pathnameOfPageURL = window.location.pathname;
+  elements = []
+  constructor(mainClass, range = {
+    from: firstDate,
+    to: secondDate
+  }) {
 
-  constructor() {
-    if (Page.currentPage) {return Page.currentPage;}
-    Page.currentPage = this;
+    this.range = range;
+    this.mainClass = mainClass;
 
-    const firstDate = new Date();
-    const secondDate = new Date();
-
-    const monthOfSecondDate = secondDate.getMonth();
-    firstDate.setMonth(monthOfSecondDate - 1);
-
-    this.range = {
-      to: secondDate,
-      from: firstDate
+    this.inputData = {
+      rangePicker: [this.range],
+      chart: [{range: this.range, link: '#', url: 'api/dashboard/'}], // dont fogget join url
+      sortableTable: [header, {range: this.range, url: 'api/dashboard/bestsellers', isSortLocally: true}] 
     };
 
-    this.currentTemplate = {
-      '/': this.dashbordTemplate,
-      '/products': this.productsTemplate,
-      '/categories': this.categoriesTemplate,
-      '/sales': this.salesTemplate, 
-    };
-
-    this.inputDataAsArrayOfConstructors = this.getInputDataAsArrayOfConstructors();
-    this.containersForFillig = this.getContainersForFillig();
+    this.containersForFillig = ['rangePicker', 'orders-chart', 'sales-chart', 'customers-chart', 'sortableTable'];
 
     this.components = [
-      ['rangePicker', RangePicker, this.inputDataAsArrayOfConstructors.rangePicker],
-      ['chart', ColumnChart, this.inputDataAsArrayOfConstructors.chart],
-      ['sortableTable', SortableTable, this.inputDataAsArrayOfConstructors.sortableTable],
+      ['rangePicker', RangePicker, this.inputData.rangePicker],
+      ['chart', ColumnChart, this.inputData.chart],
+      ['sortableTable', SortableTable, this.inputData.sortableTable],
     ];
-  }
-
-  getInputDataAsArrayOfConstructors() {
-    const getter = {
-      '/': () => {
-        return {
-          rangePicker: [Page.currentPage.range],
-          chart: [{range: Page.currentPage.range, link: '#', url: 'api/dashboard/'}], // dont fogget join url
-          sortableTable: [header, {range: Page.currentPage.range, url: 'api/dashboard/bestsellers', isSortLocally: true}] 
-        };
-      }
-    };
-    return getter[this.pathnameOfPageURL]();
-  }
-
-  getContainersForFillig() {
-    const getter = {
-      '/': () => {
-        return ['rangePicker', 'orders-chart', 'sales-chart', 'customers-chart', 'sortableTable'];
-      }
-    };
-    return getter[this.pathnameOfPageURL]();
-  }
-
-  updatePathnameOfPageURL() {
-    this.pathnameOfPageURL = window.location.pathname;
-    this.inputDataAsArrayOfConstructors = this.getInputDataAsArrayOfConstructors();
-    this.containersForFillig = this.getContainersForFillig();
-    this.render();
   }
 
   dashbordTemplate() {
@@ -129,13 +94,36 @@ export default class Page {
     return await Promise.all(elements);
   }
 
-  async render() {
-    this.element = this.currentTemplate[this.pathnameOfPageURL]();
-    this.setSubElements();
+  async update() {
+    console.log(this.inputData.rangePicker[0]);
+    const progressbar = document.querySelector('.progress-bar');
+    progressbar.hidden = false;
     const elements = await this.getElements();
-    elements.forEach(([containerOfElement, element]) => {containerOfElement.append(element.element);});
-    if(this.pathnameOfPageURL === '/') (new Tooltip()).initialize();
+    elements.forEach(([containerOfElement, element]) => {
+      this.elements.push(element.element);
+      containerOfElement.append(element.element);
+    });
+    progressbar.hidden = true;
+  }
+
+  async render() {
+    this.element = this.dashbordTemplate();
+    this.setSubElements();
+    await this.update();
+    (new Tooltip()).initialize();
+    
+
+    this.element.addEventListener('date-select', async (event) => {
+      const { from, to } = event.detail;
+      this.range.from = new Date(from);
+      this.range.to = new Date(to);
+      this.elements.forEach(element => {
+        if (!element.toString().includes('Range')) {element.remove();}
+        console.log(element);
+      });
+      await this.update();
+    });
     return this.element;
   }
 }
-
+//
