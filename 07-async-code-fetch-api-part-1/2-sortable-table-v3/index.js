@@ -13,10 +13,10 @@ export default class SortableTable {
       id: field = headerConfig.find(cell => cell.sortable).id,
       order = 'asc'
     } = {},
-    // range: {
-    //   from = (new Date('2022-08-28')).toISOString(),
-    //   to = (new Date('2022-09-27')).toISOString() 
-    // } = {},
+    range: {
+      from = (new Date('2022-08-28')).toISOString(),
+      to = (new Date('2022-09-27')).toISOString() 
+    } = {},
     isSortLocally = false,
   } = {}) {
 
@@ -25,8 +25,8 @@ export default class SortableTable {
       order,
       start: 0,
       end: 30,
-      // from,
-      // to
+      from,
+      to
     };
     this.isSortLocally = isSortLocally;
     this.headerConfig = headerConfig;
@@ -129,8 +129,8 @@ export default class SortableTable {
   }
 
   updateQueryStringOfURL({ from, to, field, order, start, end } = this.paramOfSort) {
-    // this.url.searchParams.set('from', from);
-    // this.url.searchParams.set('to', to);
+    this.url.searchParams.set('from', from);
+    this.url.searchParams.set('to', to);
     this.url.searchParams.set('_sort', field);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);

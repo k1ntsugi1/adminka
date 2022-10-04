@@ -1,0 +1,9 @@
+@import url("common.css");
+
+/* Styles for components  */
+/* components */
+@import url("../10-routes-browser-history-api/1-dashboard-page/components/column-chart/src/style.css");
+@import url("../10-routes-browser-history-api/1-dashboard-page/components/range-picker/src/style.css");
+@import url("../10-routes-browser-history-api/1-dashboard-page/components/sortable-table/src/style.css");
+@import url("../../06-events-practice/2-tooltip/style.css");
+

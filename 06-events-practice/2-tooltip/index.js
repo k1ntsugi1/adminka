@@ -36,7 +36,7 @@ class Tooltip {
   pointerOverHandler = (event) => {
     const tooltipTarget = event.target?.closest('[data-tooltip]');
     if (!tooltipTarget) {return;}
-
+    
     const { dataset: 
       {
         tooltip: newDataOfTooltip,

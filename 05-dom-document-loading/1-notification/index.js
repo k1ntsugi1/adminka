@@ -4,12 +4,12 @@ export default class NotificationMessage {
     this.duration = duration;
     this.durationStart = duration;
     this.type = type;
-    // хотел сделать через "get element" и тем самым не создавать render и свойство "element" инстанса класса, но тогда не проходят тесты почему-то.
+    
     this.render(); 
   }
   createElement(wrapperOfElement = null) {
     const element = wrapperOfElement ?? document.createElement('div');
-    element.className = `${element.className} notification ${this.type}`; // with classList doesn't work "the token provided must not be empty" 
+    element.className = `${element.className} notification ${this.type}`;
     element.style['--value'] = `${this.duration / 1000}s`;
     const bodyElement = `
         <div class="timer"></div>

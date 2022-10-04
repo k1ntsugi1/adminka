@@ -12,7 +12,7 @@ export default class ColumnChart {
     constructor({
       label: title = '',
       link = '#',
-      url = `/api/dashboard/${title}`,
+      url = ``,
       formatHeading = item => `${item}`,
       range: {
         from = new Date(),
@@ -38,7 +38,7 @@ export default class ColumnChart {
     createChart(currentValue) {
       const currentValueByScale = Math.floor(this.scale * currentValue);
       const currentValueByPercent = (currentValue / Math.max(...this.data) * 100).toFixed(0);
-      return `<div style="--value: ${currentValueByScale}" data-tooltip="${currentValueByPercent}%"></div>`;
+      return `<div style="--value: ${currentValueByScale}" data-tooltip="${currentValue}"></div>`;
     }
     getColumnChartBody() {
       return this.data.map((currentValue) => this.createChart(currentValue)).join('');
