@@ -42,7 +42,7 @@ module.exports = {
     'key-spacing': 'warn',
     'keyword-spacing': 'warn',
     'new-cap': 'warn',
-    'no-mixed-spaces-and-tabs': 'warn',
+    //'no-mixed-spaces-and-tabs': 'warn',
     'one-var': ['warn', {
       var: 'never',
       let: 'never',
