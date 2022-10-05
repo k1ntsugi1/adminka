@@ -409,7 +409,7 @@ export default class ProductForm {
   addEventListeners() {
 
     const { productForm, imageListContainer } = this.subElements;
-    console.log(productForm, this.submitHandler);
+
     productForm.addEventListener('submit', this.submitHandler);
     productForm.uploadImage.addEventListener('click', this.loadImgHander);
     imageListContainer.addEventListener('pointerdown', this.removeListItemHandler);
@@ -427,7 +427,6 @@ export default class ProductForm {
         productForm[name].value = value;
       }
     });
-  
   }
 
   createImages() {
@@ -437,12 +436,15 @@ export default class ProductForm {
   }
 
   async render() {
-    
+    this.element = this.getElement();
     this.data = await this.getData();
     this.element = this.getElement();
+
     this.setSubElements();
     this.addEventListeners();
+
     if (this.productId) { this.createProduct(); }
+
     this.createImages();
     return this.element;
   }

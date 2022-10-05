@@ -10,7 +10,8 @@ export default class DashboardPage {
 
   subElements = {}
   elements = []
-  
+  wrappersOfElementHTML = [];
+
   constructor({mainClass, range, url}) {
 
     const [path, backendURL] = url;
@@ -34,7 +35,7 @@ export default class DashboardPage {
       }] 
     };
 
-    this.components = [
+    this.dataOfComponents = [
       ['rangePicker', RangePicker, this.inputData.rangePicker],
       ['chart', ColumnChart, this.inputData.chart],
       ['sortableTable', SortableTable, this.inputData.sortableTable],
@@ -73,15 +74,16 @@ export default class DashboardPage {
     }
   }
 
-  async getElements() {
+  async getHTMLDataOfElements() {
     const elements = Object.entries(this.subElements).flatMap(([nameOfContainer, container]) => {
       if (!DashboardPage.containersForFillig.includes(nameOfContainer)) {return [];}
 
-      const component = this.components.find(([name]) => nameOfContainer.includes(name));
+      const component = this.dataOfComponents.find(([name]) => nameOfContainer.includes(name));
     
       if (!component) {return [];}
 
       const [nameOfConstructor, Constructor, dataAsArray] = component;
+      
 
       if (nameOfConstructor === 'chart') {
         const [typeOfChart] = nameOfContainer.match(/^[a-z0-9]+/);
@@ -90,12 +92,14 @@ export default class DashboardPage {
         data.label = typeOfChart;
         data.url = (new URL(this.path + typeOfChart, this.backendURL)).toString();
 
-        const elementHTML = new Constructor(data);
-        return [[container, elementHTML]];
+        const wrapperOfElementHTML = new Constructor(data);
+        this.wrappersOfElementHTML.push(wrapperOfElementHTML);
+        return [[container, wrapperOfElementHTML]];
       }
 
-      const elementHTML = new Constructor(...dataAsArray);
-      return [[container, elementHTML]];
+      const wrapperOfElementHTML = new Constructor(...dataAsArray);
+      this.wrappersOfElementHTML.push(wrapperOfElementHTML);
+      return [[container, wrapperOfElementHTML]];
     });
     return await Promise.all(elements);
   }
@@ -104,11 +108,11 @@ export default class DashboardPage {
     this.mainClass.toggleProgressbar();
 
 
-    const components = await this.getElements();
+    const htmlDataOfElements = await this.getHTMLDataOfElements();
 
-    components.forEach(([containerOfElement, element]) => {
-      this.elements.push(element.element);
-      containerOfElement.append(element.element);
+    htmlDataOfElements.forEach(([containerOfElement, wrapperOfElementHTML]) => {
+      //this.con.push(wrapperOfElementHTML.element);
+      containerOfElement.append(wrapperOfElementHTML.element);
     });
 
     this.mainClass.toggleProgressbar();
@@ -127,7 +131,11 @@ export default class DashboardPage {
   changeRangeHandler = (event) => {
     this.updateRange(event.detail);
 
-    this.elements.forEach(element => {element.remove();});
+    this.wrappersOfElementHTML.forEach(wrapper => {
+      //console.log(wrapper instanceof RangePicker);
+      //if (!(wrapper instanceof RangePicker)) {wrapper.destroy();}
+      wrapper.destroy();
+    });
     this.elements = [];
 
     this.update();
@@ -156,6 +164,7 @@ export default class DashboardPage {
   }
 
   destroy() {
+    this.wrappersOfElementHTML.forEach(wrapper => {wrapper.destroy();});
     this.remove();
   }
 }

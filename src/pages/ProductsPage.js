@@ -31,7 +31,7 @@ export default class ProductsPage {
   
     get ProductsElement() {
       const wrapper = document.createElement('div');
-      const dashbord = `
+      const products = `
         <div class="products-list">
             <div class="content__top-panel">
                 <h1 class="page-title">Товары</h1>
@@ -39,7 +39,7 @@ export default class ProductsPage {
             </div>
             <div data-element="productsContainer" class="products-list__container"></div>
         </div>`;
-      wrapper.innerHTML = dashbord;
+      wrapper.innerHTML = products;
       return wrapper.firstElementChild;
     }
   
@@ -51,18 +51,18 @@ export default class ProductsPage {
       }
     }
   
-    async getElement() {
-      const elementHTML = new this.Constructor(...this.inputData);
-      return elementHTML;
+    setWrapperOfElementHTML() {
+      this.wrapperOfElementHTML = new this.Constructor(...this.inputData);
     }
   
     async update() {
       this.mainClass.toggleProgressbar();
       const { productsContainer } = this.subElements;
   
-      const component = await this.getElement();
+      this.setWrapperOfElementHTML();
+      await this.wrapperOfElementHTML.render();
 
-      productsContainer.append(component.element);
+      productsContainer.append(this.wrapperOfElementHTML.element);
   
       this.mainClass.toggleProgressbar();
     }
@@ -85,6 +85,7 @@ export default class ProductsPage {
     }
   
     destroy() {
+      this.wrapperOfElementHTML.destroy();
       this.remove();
     }
 }

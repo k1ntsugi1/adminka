@@ -213,7 +213,6 @@ export default class SortableTable {
   }
 
   removeEventListeners() {
-    console.log(this.scrollHandler === this.scrollHandler)
     document.removeEventListener('scroll', this.scrollHandler);
   }
 
@@ -311,6 +310,7 @@ export default class SortableTable {
     this.subElements = {};
   }
   destroy() {
+    console.log(1)
     this.removeEventListeners();
     this.remove();
   }

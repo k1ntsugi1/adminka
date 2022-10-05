@@ -1,11 +1,9 @@
 import DashboardPage from "./pages/DashBoardPage.js";
 import SalesPage from './pages/SalesPage.js';
-// import CategoriesPage from './src/pages/CategoriesPage.js';
+import CategoriesPage from './pages/CategoriesPage.js';
 import ProductsPage from './pages/ProductsPage.js';
 import ProductFormPage from './pages/ProductFormPage.js';
-// import UndefinedPage from './src/pages/UndefinedPage.js';
-
-// import header from './bestsellers-header.js';
+// import UndefinedPage from './pages/UndefinedPage.js';
 
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
@@ -28,7 +26,7 @@ export default class Page {
 	  this.pages = {
 		  '/': DashboardPage,
 	      '/products': ProductsPage,
-	    //   '/categories': CategoriesPage,
+	      '/categories': CategoriesPage,
 	      '/sales': SalesPage
 	    };
 	  	this.urls = {

@@ -7,7 +7,9 @@ export default class SalesPage {
     static containersForFillig = ['rangePicker', 'sortableTableContainer'];
 
     subElements = {}
-    elements = []
+    wrappersOfElementHTML = []
+    
+
     constructor({mainClass, range, url}) {
   
       const [path, backendURL] = url;
@@ -70,8 +72,9 @@ export default class SalesPage {
     
         const [_, Constructor, dataAsArray] = component;
     
-        const elementHTML = new Constructor(...dataAsArray);
-        return [[container, elementHTML]];
+        const wrapperOfElementHTML = new Constructor(...dataAsArray);
+        this.wrappersOfElementHTML.push(wrapperOfElementHTML);
+        return [[container, wrapperOfElementHTML]];
       });
       return await Promise.all(elements);
     }
@@ -80,11 +83,11 @@ export default class SalesPage {
       this.mainClass.toggleProgressbar();
     
     
-      const components = await this.getElements();
+      const htmlDataOfElements = await this.getElements();
     
-      components.forEach(([containerOfElement, element]) => {
-        this.elements.push(element.element);
-        containerOfElement.append(element.element);
+      htmlDataOfElements.forEach(([containerOfElement, wrapperOfElementHTML]) => {
+        //this.elements.push(wrapperOfElementHTML.element);
+        containerOfElement.append(wrapperOfElementHTML.element);
       });
     
       this.mainClass.toggleProgressbar();
@@ -104,7 +107,7 @@ export default class SalesPage {
       changeRangeHandler = (event) => {
         this.updateRange(event.detail);
     
-        this.elements.forEach(element => {element.remove();});
+        this.wrappersOfElementHTML.forEach(wrapper => {wrapper.destroy();});
         this.elements = [];
     
         this.update();
@@ -131,6 +134,7 @@ export default class SalesPage {
       }
   
       destroy() {
+        this.wrappersOfElementHTML.forEach(wrapper => {wrapper.destroy();});
         this.remove();
       }
 }

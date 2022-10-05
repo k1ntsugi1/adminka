@@ -43,21 +43,18 @@ export default class ProductFormPage {
       }
     }
 
-    async getElement() {
-      const elementHTML = new this.Constructor(this.productId, this.urlsForAJAX);
-
-      await elementHTML.render();
-      console.log(elementHTML.element);
-      return elementHTML;
+    setWrapperOfElementHTML() {
+      this.wrapperOfElementHTML = new this.Constructor(this.productId, this.urlsForAJAX);
     }
   
     async update() {
       this.mainClass.toggleProgressbar();
       const { contentBox } = this.subElements;
 
-      const component = await this.getElement();
+      this.setWrapperOfElementHTML();
+      await this.wrapperOfElementHTML.render();
 
-      contentBox.append(component.element);
+      contentBox.append(this.wrapperOfElementHTML.element);
   
       this.mainClass.toggleProgressbar();
     }
@@ -68,5 +65,15 @@ export default class ProductFormPage {
       await this.update();
       //this.element = this.ProductFormElement;
       return this.element;
+    }
+
+    remove() {
+      this.element.remove();
+      this.element = null;
+    }
+
+    destroy() {
+      this.wrapperOfElementHTML.destroy();
+      this.remove();
     }
 }
