@@ -92,7 +92,7 @@ export default class SortableTable {
 
   getRowOfTableBody(rowItem) {
     return (
-      `<a href="/products/${rowItem.id}" class="sortable-table__row">
+      `<a href="/products/${rowItem.id}" class="sortable-table__row" data-element="rowOfTableBody">
         ${this.cells.map(key => this.getCellOfTableBody(rowItem[key], key)).join('')}
       </a>`
     );
@@ -185,10 +185,29 @@ export default class SortableTable {
     this.updateElement();
   }
 
+  openProductFormHandler = (event) => {
+    const currentTarget = event.currentTarget;
+    const target = event.target.closest('[data-element="rowOfTableBody"]');
+    if (!target) {return;}
+
+    const id = target.getAttribute('href');
+    currentTarget.dispatchEvent(this.createCustomEventOfUpdatingHref(`/products/${id}`));
+
+    window.history.pushState(null, null, `/products/${id}`);
+  }
+
+  createCustomEventOfUpdatingHref(href) {
+	  return new CustomEvent('updatedHref', {
+	    bubbles: true,
+	    detail: { href }
+		  });
+  }
+  
   addEventListeners() {
-    const { header, emptyPlaceholder} = this.subElements;
-    header.addEventListener('pointerdown', this.sortByHeaderHandler);
+    const { header, body, emptyPlaceholder} = this.subElements;
     document.addEventListener('scroll', this.scrollHandler);
+    header.addEventListener('pointerdown', this.sortByHeaderHandler);
+    body.addEventListener('pointerdown', this.openProductFormHandler);
     emptyPlaceholder.addEventListener('click', this.resetParamsOfSortHandler({...this.paramOfSort}));
   }
 

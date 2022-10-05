@@ -2,6 +2,7 @@ import DashboardPage from "./pages/DashBoardPage.js";
 import SalesPage from './pages/SalesPage.js';
 // import CategoriesPage from './src/pages/CategoriesPage.js';
 import ProductsPage from './pages/ProductsPage.js';
+import ProductFormPage from './components/ProductForm.js';
 // import UndefinedPage from './src/pages/UndefinedPage.js';
 
 // import header from './bestsellers-header.js';
@@ -24,17 +25,17 @@ export default class Page {
 
 	  this.range = this.createRange();
 
-	    this.pages = {
-	      '/': DashboardPage,
+	  this.pages = {
+		  '/': DashboardPage,
 	      '/products': ProductsPage,
 	    //   '/categories': CategoriesPage,
 	      '/sales': SalesPage
 	    };
-	  	    this.urls = {
+	  	this.urls = {
 	      '/': 'api/dashboard/',
 	       '/products': 'api/rest/products',
-	    //   '/categories': CategoriesPage,
-	       '/sales': 'api/rest/orders'
+	       '/categories': '/api/rest/categories',
+	       '/sales': 'api/rest/orders',
 	    };
 	  this.render();
 	}
@@ -96,12 +97,35 @@ export default class Page {
 	  return wrapper.firstElementChild;
 	}
 
+	async setProductFormPage() {
+ 
+	  const id = this.currentHrefOfPage.match(/\/[a-z0-9-_]&/gi);
+	  const Constructor = ProductFormPage;
+
+	  this.showingPage = await new Constructor({
+	    productId: id,
+	    urls: {...this.urls, backendURL: BACKEND_URL}
+	  });
+
+	  this.contentContainer.append(this.showingPage.element);
+	  this.toggleProgressbar();
+	}
+
 	async updateShowingPage() {
 	  this.showingPage?.destroy();
 	  this.toggleProgressbar();
+	  
+	  const isFormPage = this.currentHrefOfPage.search(/^products\/[a-z0-9\s]+/i);
 
-	  const urlOfAJAX = this.urls[this.currentHrefOfPage] ?? '';
+	  if (isFormPage) {
+	    await this.setProductFormPage();
+	    return;
+	  }
+	
+	  const urlOfAJAX = this.urls[this.currentHrefOfPage] ?? '/undefined';
+
 	  const Constructor = this.pages[this.currentHrefOfPage] ?? UndefinedPage;
+
 	  const { from, to } = this.range;
 
 	  this.showingPage = await new Constructor({
@@ -127,7 +151,6 @@ export default class Page {
 	  const { href } = event.detail;
 	  this.currentHrefOfPage = href;
 
-	  console.log(this.currentHrefOfPage);
 	  this.updateShowingPage();
 	}
 
@@ -141,10 +164,15 @@ export default class Page {
 	  const href = hrefElementOfPage.getAttribute('href');
 
 	  window.history.pushState(null, null, href);
-	  event.target.dispatchEvent(new CustomEvent('updatedHref', {
-		bubbles: true,
+
+	  event.target.dispatchEvent(this.createCustomEventOfUpdatingHref(href));
+	}
+
+	createCustomEventOfUpdatingHref(href) {
+	  return new CustomEvent('updatedHref', {
+	    bubbles: true,
 	    detail: { href }
-	  }));
+		  });
 	}
 
 	addEventListeners() {

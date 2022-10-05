@@ -15,17 +15,17 @@ export default class ProductForm {
   constructor(
     productId,
     {
-      categoriesPath = '/api/rest/categories',
-      productPath = `/api/rest/products`,
-      imagePath = '3/image'
+      categoriesURL,
+      productURL,
+      imageURL,
     } = {}
   ) {
     this.productId = productId;
   
     this.urls = {
-      categories: new URL(categoriesPath, BACKEND_URL),
-      product: new URL(productPath, BACKEND_URL),
-      images: new URL(imagePath, IMGUR_CLIENT),
+      categories: new URL(categoriesURL),
+      product: new URL(productURL),
+      images: new URL(imageURL, IMGUR_CLIENT),
     };
   }
 
