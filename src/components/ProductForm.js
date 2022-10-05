@@ -1,5 +1,8 @@
 import escapeHtml from "../store/escape-html.js";
-import SortableList from '../components/SortableList.js'
+import SortableList from '../components/SortableList.js';
+
+import grabIcon from '../styles/svg/icon-grab.svg';
+import trashIcon from '../styles/svg//icon-trash.svg';
 
 const IMGUR_CLIENT_ID = '28aaa2e823b03b1';
 const IMGUR_CLIENT = 'https://api.imgur.com/';
@@ -86,12 +89,12 @@ export default class ProductForm {
         <input type="hidden" name="url" value="${escapedUrl}">
         <input type="hidden" name="source" value="${escapedSource}">
         <span>
-          <img src="./icon-grab.svg" data-grab-handle="" alt="grab">
+          <img src=${grabIcon} data-grab-handle="" alt="grab">
           <img class="sortable-table__cell-img" alt="Image" src="${escapedUrl}">
           <span>${escapedSource}</span>
         </span>
         <button type="button">
-          <img src="./icon-trash.svg" data-delete-handle="" alt="delete">
+          <img src=${trashIcon} data-delete-handle="" alt="delete">
         </button>
       </li>`;
     return wrapper.firstElementChild;
@@ -267,7 +270,7 @@ export default class ProductForm {
     
     const entriesOfResponses = dataOfResponses.map((data, index) => {
       const nameOfData = namesOfURLs[index];
-      if (nameOfData === 'product') {this.images = data[0].images ?? [];}
+      if (nameOfData === 'product') {this.images = data[0]?.images ?? [];}
       return [nameOfData, data];
     });
 

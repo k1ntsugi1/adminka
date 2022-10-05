@@ -1,5 +1,7 @@
 import SortableList from "./SortableList.js";
 
+import grabIcon from '../styles/svg/icon-grab.svg';
+
 export default class CategoriesList {
   data = []
   element = null
@@ -21,7 +23,7 @@ export default class CategoriesList {
 
     const subCategoryLI = `
         <li class="categories__sortable-list-item sortable-list__item"  data-id="${id}">
-            <img src="./icon-grab.svg" data-grab-handle="" alt="grab">
+            <img src=${grabIcon} data-grab-handle="" alt="grab">
             <strong >${title}</strong>
             <span><b>${count}</b> products</span>
         </li>`;
