@@ -35,7 +35,7 @@ export default class ProductsPage {
         <div class="products-list">
             <div class="content__top-panel">
                 <h1 class="page-title">Товары</h1>
-                <a href="/products/add" class="button-primary">Добавить товар</a>
+                <a href="/products/add" class="button-primary" data-element="addProductBtn">Добавить товар</a>
             </div>
             <div data-element="productsContainer" class="products-list__container"></div>
         </div>`;
@@ -67,11 +67,25 @@ export default class ProductsPage {
       this.mainClass.toggleProgressbar();
     }
   
+    addProductHandler = (event) => {
+      const target = event.target.closest('[data-element="addProductBtn"]');
+      if (!target) {return ;}
+      const href = target.getAttribute('href');
+      target.dispatchEvent(this.createCustomEventOfUpdatingHref(`${href}`));
 
+      window.history.pushState(null, null, `${href}`);
+    }
+
+    createCustomEventOfUpdatingHref(href) {
+      return new CustomEvent('updatedHref', {
+        bubbles: true,
+        detail: { href }
+      });
+    }
   
     async render() {
       this.element = this.ProductsElement;
-
+      this.element.addEventListener('click', this.addProductHandler);
       this.setSubElements();
   
       await this.update();

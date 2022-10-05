@@ -102,7 +102,7 @@ export default class Page {
 
 	  this.showingPage = await new Constructor({
 	    mainClass: this,
-	    productId: id,
+	    productId: id === 'add' ? null : id,
 	    urls: {...this.urls, backendURL: BACKEND_URL}
 	  });
 	  this.contentContainer.append(this.showingPage.element);
