@@ -1,36 +1,72 @@
-import ProductForm from "../components/ProductForm";
+import ProductForm from "../components/ProductForm.js";
 
 export default class ProductFormPage {
     subElements= {}
     element = null
 
-    constructor(productId, urls) {
+    constructor({mainClass, productId, urls}) {
 
       this.productId = productId;
+      this.mainClass = mainClass;
+      this.Constructor = ProductForm;
 
       this.urlsForAJAX = {
-        categoriesURL: (new URL(urls['/categories'], urls[backendURL])).toISOString(),
-        productURL: (new URL(urls['/products'], urls[backendURL])).toISOString(),
+        categoriesURL: (new URL(urls['/categories'], urls['backendURL'])),
+        productURL: (new URL(urls['/products'], urls['backendURL'])),
         imageURL: '3/image'
       };
+
       this.render();
     }
 
-
-    get ProductPage() {
-
+    get ProductFormElement() {
+      const wrapper = document.createElement('div');
+      const bodyOfWrapper = `
+        <div class="products-edit">
+          <div class="content__top-panel">
+            <h1 class="page-title">
+              <a href="/products" class="link">Товары</a> / ${this.productId ? 'Редактировать' : 'Создать'}
+            </h1>
+          </div>
+          <div class="contentBox" data-element="contentBox"></div>
+        </div>`;
+      wrapper.innerHTML = bodyOfWrapper;
+      return wrapper.firstElementChild;
     }
+
     setSubElements() {
-      const elements = this.element.querySelectorAll('div[data-element]');
+      const elements = this.element.querySelectorAll('[data-element]');
 
       for (const element of elements) {
         const name = element.dataset.element;
         this.subElements[name] = element;
       }
-
     }
-    render() {
-      this.element = ProductPage;
+
+    async getElement() {
+      const elementHTML = new this.Constructor(this.productId, this.urlsForAJAX);
+
+      await elementHTML.render();
+      console.log(elementHTML.element);
+      return elementHTML;
+    }
+  
+    async update() {
+      this.mainClass.toggleProgressbar();
+      const { contentBox } = this.subElements;
+
+      const component = await this.getElement();
+
+      contentBox.append(component.element);
+  
+      this.mainClass.toggleProgressbar();
+    }
+
+    async render() {
+      this.element = this.ProductFormElement;
       this.setSubElements();
+      await this.update();
+      //this.element = this.ProductFormElement;
+      return this.element;
     }
 }

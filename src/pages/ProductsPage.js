@@ -71,7 +71,7 @@ export default class ProductsPage {
   
     async render() {
       this.element = this.ProductsElement;
-  
+
       this.setSubElements();
   
       await this.update();

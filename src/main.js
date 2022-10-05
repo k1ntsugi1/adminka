@@ -2,7 +2,7 @@ import DashboardPage from "./pages/DashBoardPage.js";
 import SalesPage from './pages/SalesPage.js';
 // import CategoriesPage from './src/pages/CategoriesPage.js';
 import ProductsPage from './pages/ProductsPage.js';
-import ProductFormPage from './components/ProductForm.js';
+import ProductFormPage from './pages/ProductFormPage.js';
 // import UndefinedPage from './src/pages/UndefinedPage.js';
 
 // import header from './bestsellers-header.js';
@@ -99,32 +99,32 @@ export default class Page {
 
 	async setProductFormPage() {
  
-	  const id = this.currentHrefOfPage.match(/\/[a-z0-9-_]&/gi);
+	  const id = this.currentHrefOfPage.match(/([a-z0-9_-]+$)/i)[0] ?? null;
 	  const Constructor = ProductFormPage;
 
 	  this.showingPage = await new Constructor({
+	    mainClass: this,
 	    productId: id,
 	    urls: {...this.urls, backendURL: BACKEND_URL}
 	  });
-
 	  this.contentContainer.append(this.showingPage.element);
 	  this.toggleProgressbar();
+	  console.log(this.showingPage);
 	}
 
 	async updateShowingPage() {
 	  this.showingPage?.destroy();
 	  this.toggleProgressbar();
 	  
-	  const isFormPage = this.currentHrefOfPage.search(/^products\/[a-z0-9\s]+/i);
-
+	  const [isFormPage] = this.currentHrefOfPage.match(/\/products\/([a-z0-9_-]+)/i) ?? [];
 	  if (isFormPage) {
 	    await this.setProductFormPage();
 	    return;
 	  }
-	
+	  
 	  const urlOfAJAX = this.urls[this.currentHrefOfPage] ?? '/undefined';
 
-	  const Constructor = this.pages[this.currentHrefOfPage] ?? UndefinedPage;
+	  const Constructor = this.pages[this.currentHrefOfPage] //?? UndefinedPage;
 
 	  const { from, to } = this.range;
 
@@ -140,6 +140,7 @@ export default class Page {
 	  this.contentContainer.append(this.showingPage.element);
 
 	  this.toggleProgressbar();
+	  console.log(this.showingPage);
 	}
 
 	toggleSidebarHandler = () => {

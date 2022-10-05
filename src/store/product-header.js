@@ -4,6 +4,7 @@ const header = [
     title: 'Image',
     sortable: false,
     template: data => {
+      if (!data[0]?.url) {return `<div class="sortable-table__cell"></div>`;}
       return `
           <div class="sortable-table__cell">
             <img class="sortable-table-image" alt="Image" src="${data[0].url}">
@@ -36,7 +37,7 @@ const header = [
     sortType: 'number',
     template: data => {
       return `<div class="sortable-table__cell">
-          ${data > 0 ? 'Active' : 'Inactive'}
+          ${data && (data > 0) ? 'Active' : 'Inactive'}
         </div>`;
     }
   },

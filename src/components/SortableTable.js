@@ -37,7 +37,6 @@ export default class SortableTable {
       }
       return acc;
     }, {});
-
     this.render();
   }
 
@@ -85,6 +84,7 @@ export default class SortableTable {
   }
 
   getCellOfTableBody(value, key) {
+
     return this.templates[key] 
       ? this.templates[key](value)
       : `<div class="sortable-table__cell">${value}</div>`;
@@ -120,6 +120,7 @@ export default class SortableTable {
 
   updateElement() {
     const { body, header } = this.subElements;
+  
     header.innerHTML = this.getTableHeader();
     body.innerHTML = this.getTableBody();
   }
@@ -191,9 +192,9 @@ export default class SortableTable {
     if (!target) {return;}
 
     const id = target.getAttribute('href');
-    currentTarget.dispatchEvent(this.createCustomEventOfUpdatingHref(`/products/${id}`));
+    currentTarget.dispatchEvent(this.createCustomEventOfUpdatingHref(`${id}`));
 
-    window.history.pushState(null, null, `/products/${id}`);
+    window.history.pushState(null, null, `${id}`);
   }
 
   createCustomEventOfUpdatingHref(href) {
@@ -212,10 +213,8 @@ export default class SortableTable {
   }
 
   removeEventListeners() {
-    const { header, emptyPlaceholder } = this.subElements; 
-    header.removeEventListener('pointerdown', this.sortByHeaderHandler);
-    document.removeEventListener('scroll', this.scrollBodyOfTableHandler);
-    emptyPlaceholder.removeEventListener('click', this.resetParamsOfSortHandler({...this.paramOfSort}));
+    console.log(this.scrollHandler === this.scrollHandler)
+    document.removeEventListener('scroll', this.scrollHandler);
   }
 
   getSubElements() {
@@ -230,6 +229,7 @@ export default class SortableTable {
 
   async render() {
     this.element = this.getTableElement();
+    
     this.subElements = this.getSubElements();
     this.addEventListeners();
 
@@ -311,8 +311,8 @@ export default class SortableTable {
     this.subElements = {};
   }
   destroy() {
+    this.removeEventListeners();
     this.remove();
-
   }
 }
 

@@ -10,7 +10,7 @@ export default class DashboardPage {
 
   subElements = {}
   elements = []
-
+  
   constructor({mainClass, range, url}) {
 
     const [path, backendURL] = url;
