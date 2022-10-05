@@ -4,27 +4,27 @@ export default class SortableTable {
   data = []
 
   constructor(headerConfig, { 
-    url = `/api/dashboard/bestsellers`,
+    url = ``,
     sorted: {
       id: field = headerConfig.find(cell => cell.sortable).id,
       order = 'asc'
     } = {},
-    range: {
-      from = (new Date('2022-08-28')).toISOString(),
-      to = (new Date('2022-09-27')).toISOString() 
-    } = {},
+    range,
     isSortLocally = false,
+    showingPage = 'DashboardPage'
   } = {}) {
-
     this.paramOfSort = {
-      field,
+      field: this.showingPage === 'SalesPage' ? 'createdAt' : field,
       order,
       start: 0,
       end: 30,
-      from,
-      to
+      from: new Date(range.from).toISOString(),
+      to: new Date(range.to).toISOString(),
+      '_embed': 'subcategory.category',
     };
     this.isSortLocally = isSortLocally;
+    this.showingPage = showingPage;
+
     this.headerConfig = headerConfig;
 
     this.cells = this.headerConfig.map(item => item.id);
@@ -124,9 +124,19 @@ export default class SortableTable {
     body.innerHTML = this.getTableBody();
   }
 
-  updateQueryStringOfURL({ from, to, field, order, start, end } = this.paramOfSort) {
-    this.url.searchParams.set('from', from);
-    this.url.searchParams.set('to', to);
+  updateQueryStringOfURL({ from, to, field, order, start, end, _embed } = this.paramOfSort) {
+    if (this.showingPage === 'ProductsPage') {
+      this.url.searchParams.set('_embed', _embed);
+    } 
+    if (this.showingPage === 'DashboardPage') {
+      this.url.searchParams.set('from', from);
+      this.url.searchParams.set('to', to);
+    }
+    if (this.showingPage === 'SalesPage') {
+      this.url.searchParams.set('createdAt_gte', from);
+      this.url.searchParams.set('createdAt_lte', to);
+    }
+
     this.url.searchParams.set('_sort', field);
     this.url.searchParams.set('_order', order);
     this.url.searchParams.set('_start', start);

@@ -1,7 +1,7 @@
 import DashboardPage from "./pages/DashBoardPage.js";
-// import SalesPage from './src/pages/SalesPage.js';
+import SalesPage from './pages/SalesPage.js';
 // import CategoriesPage from './src/pages/CategoriesPage.js';
-// import ProductsPage from './src/pages/ProductPage.js';
+import ProductsPage from './pages/ProductsPage.js';
 // import UndefinedPage from './src/pages/UndefinedPage.js';
 
 // import header from './bestsellers-header.js';
@@ -26,15 +26,15 @@ export default class Page {
 
 	    this.pages = {
 	      '/': DashboardPage,
-	    //   '/products': ProductsPage,
+	      '/products': ProductsPage,
 	    //   '/categories': CategoriesPage,
-	    //   '/sales': SalesPage
+	      '/sales': SalesPage
 	    };
 	  	    this.urls = {
 	      '/': 'api/dashboard/',
-	    //   '/products': ProductsPage,
+	       '/products': 'api/rest/products',
 	    //   '/categories': CategoriesPage,
-	    //   '/sales': SalesPage
+	       '/sales': 'api/rest/orders'
 	    };
 	  this.render();
 	}
@@ -113,7 +113,6 @@ export default class Page {
 	    url: [urlOfAJAX, BACKEND_URL],
 	  });
 
-	  console.log(this.contentContainer)
 	  this.contentContainer.append(this.showingPage.element);
 
 	  this.toggleProgressbar();
@@ -124,7 +123,11 @@ export default class Page {
 	}
 
 	changePageHandler = (event) => {
-	  this.currentHrefOfPage = event.state.href;
+		
+	  const { href } = event.detail;
+	  this.currentHrefOfPage = href;
+
+	  console.log(this.currentHrefOfPage);
 	  this.updateShowingPage();
 	}
 
@@ -132,18 +135,24 @@ export default class Page {
 	  event.preventDefault();
 
 	  const hrefElementOfPage = event.target.closest('[data-page]');
+	  
 	  if (!hrefElementOfPage) {return;}
 
 	  const href = hrefElementOfPage.getAttribute('href');
-	  window.history.pushState({href}, null, href);
+
+	  window.history.pushState(null, null, href);
+	  event.target.dispatchEvent(new CustomEvent('updatedHref', {
+		bubbles: true,
+	    detail: { href }
+	  }));
 	}
 
 	addEventListeners() {
 	  const { sidebarToggler } = this.subElements;
-	  console.log(sidebarToggler);
+
 	  sidebarToggler.addEventListener('click', this.toggleSidebarHandler);
 	  this.element.addEventListener('click', this.selectPageHandler);
-	  this.element.addEventListener('popstate', this.changePageHandler);
+	  this.element.addEventListener('updatedHref', this.changePageHandler);
 
 	}
 

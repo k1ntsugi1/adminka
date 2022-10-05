@@ -3,7 +3,7 @@ import SortableTable from '../components/SortableTable.js';
 import ColumnChart from '../components/ColumnChart.js';
 import Tooltip from '../components/Tooltip.js';
 
-import header from '../store/bestsellers-header.js';
+import header from '../store/product-header.js';
 
 export default class DashboardPage {
   static containersForFillig = ['rangePicker', 'orders-chart', 'sales-chart', 'customers-chart', 'sortableTable'];
@@ -29,7 +29,8 @@ export default class DashboardPage {
       sortableTable: [header, {
         range: this.range, 
         url: (new URL(this.path + 'bestsellers', this.backendURL)).toString(),
-        isSortLocally: true
+        isSortLocally: true,
+        isDashboardPage: true,
       }] 
     };
 
