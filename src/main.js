@@ -122,7 +122,7 @@ export default class Page {
 	  
 	  const urlOfAJAX = this.urls[this.currentHrefOfPage] ?? '/undefined';
 
-	  const Constructor = this.pages[this.currentHrefOfPage] //?? UndefinedPage;
+	  const Constructor = this.pages[this.currentHrefOfPage]; //?? UndefinedPage;
 
 	  const { from, to } = this.range;
 
@@ -145,11 +145,16 @@ export default class Page {
 	  document.body.classList.toggle('is-collapsed-sidebar');
 	}
 
-	changePageHandler = (event) => {
+	changePageHandlerByCustomEvent = (event) => {
 		
 	  const { href } = event.detail;
 	  this.currentHrefOfPage = href;
 
+	  this.updateShowingPage();
+	}
+
+	changePageHandlerByPushState = () => {
+	  this.currentHrefOfPage = document.location.pathname;
 	  this.updateShowingPage();
 	}
 
@@ -179,7 +184,8 @@ export default class Page {
 
 	  sidebarToggler.addEventListener('click', this.toggleSidebarHandler);
 	  this.element.addEventListener('click', this.selectPageHandler);
-	  this.element.addEventListener('updatedHref', this.changePageHandler);
+	  this.element.addEventListener('updatedHref', this.changePageHandlerByCustomEvent);
+	  window.addEventListener('popstate', this.changePageHandlerByPushState);
 
 	}
 
