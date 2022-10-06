@@ -52,9 +52,9 @@ export default class ProductFormPage {
       const { contentBox } = this.subElements;
 
       this.setWrapperOfElementHTML();
-      await this.wrapperOfElementHTML.render();
+      const element = await this.wrapperOfElementHTML.render();
 
-      contentBox.append(this.wrapperOfElementHTML.element);
+      contentBox.append(element);
   
       this.mainClass.toggleProgressbar();
     }
@@ -63,7 +63,7 @@ export default class ProductFormPage {
       this.element = this.ProductFormElement;
       this.setSubElements();
       await this.update();
-      //this.element = this.ProductFormElement;
+  
       return this.element;
     }
 

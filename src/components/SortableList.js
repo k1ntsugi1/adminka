@@ -91,7 +91,7 @@ export default class SortableList {
 
   handlerDrag = (event) => {
     event.preventDefault();
-    console.log(event.target);
+
     if (!event.target.closest('[data-grab-handle]')) { return; }
 
     this.sortableItem = event.target.closest('[data-element="sortableItem"]');

@@ -208,8 +208,12 @@ export default class SortableTable {
     const { header, body, emptyPlaceholder} = this.subElements;
     document.addEventListener('scroll', this.scrollHandler);
     header.addEventListener('pointerdown', this.sortByHeaderHandler);
-    body.addEventListener('pointerdown', this.openProductFormHandler);
+    
     emptyPlaceholder.addEventListener('click', this.resetParamsOfSortHandler({...this.paramOfSort}));
+
+    if (this.showingPage !== 'SalesPage') {
+      body.addEventListener('pointerdown', this.openProductFormHandler);
+    }
   }
 
   removeEventListeners() {
@@ -310,7 +314,6 @@ export default class SortableTable {
     this.subElements = {};
   }
   destroy() {
-    console.log(1)
     this.removeEventListeners();
     this.remove();
   }

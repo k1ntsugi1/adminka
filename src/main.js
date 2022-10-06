@@ -138,7 +138,6 @@ export default class Page {
 	  this.contentContainer.append(this.showingPage.element);
 
 	  this.toggleProgressbar();
-	  console.log(this.showingPage);
 	}
 
 	toggleSidebarHandler = () => {

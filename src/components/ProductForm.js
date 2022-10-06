@@ -331,17 +331,18 @@ export default class ProductForm {
 
   getInputIMGLoader() {
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = `<input name="image" type="file" accept="image/*" hidden/>`;
+    wrapper.innerHTML = `<input name="image" type="file" accept="image/*" style="opacity:0"/>`;
     return wrapper.firstElementChild;
   }
 
   loadImgHander = () => {
+
     const {productForm, sortableList} = this.subElements;
 
     const inputIMGLoader = this.getInputIMGLoader();
 
     inputIMGLoader.onchange = async () => {
-
+      console.log(1234)
       const formData = new FormData();
       const file = inputIMGLoader.files[0];
       formData.append(inputIMGLoader.name, file);
@@ -362,11 +363,9 @@ export default class ProductForm {
 
     productForm.append(inputIMGLoader);
     inputIMGLoader.click();
-    
   } 
 
   submitHandler = (event) => {
-    console.log(1)
     event.preventDefault();
     const formData = this.getFormatedFormData();
 
@@ -414,6 +413,7 @@ export default class ProductForm {
     const { productForm, imageListContainer } = this.subElements;
 
     productForm.addEventListener('submit', this.submitHandler);
+    productForm.save.addEventListener('click', () => console.log('clicked'))
     productForm.uploadImage.addEventListener('click', this.loadImgHander);
     imageListContainer.addEventListener('pointerdown', this.removeListItemHandler);
   }
@@ -439,16 +439,15 @@ export default class ProductForm {
   }
 
   async render() {
-    this.element = this.getElement();
+    // this.element = this.getElement();
     this.data = await this.getData();
     this.element = this.getElement();
-
+    
     this.setSubElements();
     this.addEventListeners();
 
     if (this.productId) { this.createProduct(); }
 
-    this.createImages();
     return this.element;
   }
 
