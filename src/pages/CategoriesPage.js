@@ -20,11 +20,16 @@ export default class CategoriesPage {
     return wrapper.firstElementChild; 
   }
 
-  async render() {
-    this.element = this.categoriesElement;
+
+  async update() {
     const categoriesList = new CategoriesList(this.url);
-    await categoriesList.render();
-    this.element.append(categoriesList.element);
+    const childElement = await categoriesList.render();
+    this.element.append(childElement);
+  }
+
+  render() {
+    this.element = this.categoriesElement;
+    this.update();
     return this.element;
   }
 

@@ -74,7 +74,7 @@ export default class DashboardPage {
     }
   }
 
-  async getHTMLDataOfElements() {
+  getHTMLDataOfElements() {
     const elements = Object.entries(this.subElements).flatMap(([nameOfContainer, container]) => {
       if (!DashboardPage.containersForFillig.includes(nameOfContainer)) {return [];}
 
@@ -101,21 +101,15 @@ export default class DashboardPage {
       this.wrappersOfElementHTML.push(wrapperOfElementHTML);
       return [[container, wrapperOfElementHTML]];
     });
-    return await Promise.all(elements);
+    return elements;
   }
 
-  async update() {
-    this.mainClass.toggleProgressbar();
-
-
-    const htmlDataOfElements = await this.getHTMLDataOfElements();
+  update() {
+    const htmlDataOfElements = this.getHTMLDataOfElements();
 
     htmlDataOfElements.forEach(([containerOfElement, wrapperOfElementHTML]) => {
-      //this.con.push(wrapperOfElementHTML.element);
       containerOfElement.append(wrapperOfElementHTML.element);
     });
-
-    this.mainClass.toggleProgressbar();
   }
 
   updateRange(newRange) {
@@ -132,8 +126,6 @@ export default class DashboardPage {
     this.updateRange(event.detail);
 
     this.wrappersOfElementHTML.forEach(wrapper => {
-      //console.log(wrapper instanceof RangePicker);
-      //if (!(wrapper instanceof RangePicker)) {wrapper.destroy();}
       wrapper.destroy();
     });
     this.elements = [];
@@ -145,16 +137,15 @@ export default class DashboardPage {
     this.element.addEventListener('date-select', this.changeRangeHandler);
   }
 
-  async render() {
+  render() {
     this.element = this.dashbordElement;
 
     this.setSubElements();
-
-    await this.update();
-
     (new Tooltip()).initialize();
     this.addEventListeners();
-    
+
+    this.update();
+
     return this.element;
   }
 

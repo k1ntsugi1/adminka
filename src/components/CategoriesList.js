@@ -83,6 +83,7 @@ export default class CategoriesList {
     await this.setData();
     this.element = this.categoriesList;
     this.element.addEventListener('click', this.toggleOfOpenCategoryHandler);
+    return this.element;
   }
 
   remove() {

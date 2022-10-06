@@ -13,6 +13,7 @@ export default class SortableTable {
     isSortLocally = false,
     showingPage = 'DashboardPage'
   } = {}) {
+
     this.paramOfSort = {
       field: this.showingPage === 'SalesPage' ? 'createdAt' : field,
       order,
@@ -22,6 +23,7 @@ export default class SortableTable {
       to: new Date(range.to).toISOString(),
       '_embed': 'subcategory.category',
     };
+
     this.isSortLocally = isSortLocally;
     this.showingPage = showingPage;
 
@@ -91,10 +93,12 @@ export default class SortableTable {
   }
 
   getRowOfTableBody(rowItem) {
+    const typeOfContainer = this.showingPage === 'SalesPage' ? 'div' : 'a';
+    const href = this.showingPage === 'SalesPage' ? '' : `href="/products/${rowItem.id}"`;
     return (
-      `<a href="/products/${rowItem.id}" class="sortable-table__row" data-element="rowOfTableBody">
-        ${this.cells.map(key => this.getCellOfTableBody(rowItem[key], key)).join('')}
-      </a>`
+      `<${typeOfContainer} ${href} class="sortable-table__row" data-element="rowOfTableBody">
+          ${this.cells.map(key => this.getCellOfTableBody(rowItem[key], key)).join('')}
+       </${typeOfContainer}>`
     );
   }
 
@@ -111,8 +115,8 @@ export default class SortableTable {
           ${this.getTableHeader()}
         </div>
         <div data-element="body" class="sortable-table__body"></div>
-        ${this.getLoadingLine()}
-        ${this.getMessageForEmptyDataOfLoading()}
+          ${this.getLoadingLine()}
+          ${this.getMessageForEmptyDataOfLoading()}
       </div>`
     );
     return wrapper.firstElementChild;
@@ -185,59 +189,19 @@ export default class SortableTable {
     this.data = await this.getDataFromServer();
     this.updateElement();
   }
-
-  openProductFormHandler = (event) => {
-    const currentTarget = event.currentTarget;
-    const target = event.target.closest('[data-element="rowOfTableBody"]');
-    if (!target) {return;}
-
-    const id = target.getAttribute('href');
-    currentTarget.dispatchEvent(this.createCustomEventOfUpdatingHref(`${id}`));
-
-    window.history.pushState(null, null, `${id}`);
-  }
-
-  createCustomEventOfUpdatingHref(href) {
-	  return new CustomEvent('updatedHref', {
-	    bubbles: true,
-	    detail: { href }
-		  });
-  }
   
   addEventListeners() {
-    const { header, body, emptyPlaceholder} = this.subElements;
-    document.addEventListener('scroll', this.scrollHandler);
+    const { header, emptyPlaceholder} = this.subElements;
+    if (this.showingPage !== 'DashboardPage') {
+      document.addEventListener('scroll', this.scrollHandler);
+    }
     header.addEventListener('pointerdown', this.sortByHeaderHandler);
     
     emptyPlaceholder.addEventListener('click', this.resetParamsOfSortHandler({...this.paramOfSort}));
-
-    if (this.showingPage !== 'SalesPage') {
-      body.addEventListener('pointerdown', this.openProductFormHandler);
-    }
   }
 
   removeEventListeners() {
     document.removeEventListener('scroll', this.scrollHandler);
-  }
-
-  getSubElements() {
-    const result = {};
-    const subElements = this.element.querySelectorAll('div[data-element]');
-    for (const subElement of subElements) {
-      const name = subElement.dataset.element;
-      result[name] = subElement;
-    }
-    return result;
-  }
-
-  async render() {
-    this.element = this.getTableElement();
-    
-    this.subElements = this.getSubElements();
-    this.addEventListeners();
-
-    this.data = await this.getDataFromServer();
-    this.updateElement();
   }
 
   switchStatusOfLoading() {
@@ -304,6 +268,26 @@ export default class SortableTable {
 
   async update(from = this.paramOfSort.from, to = this.paramOfSort.to) {
     this.paramOfSort = {...this.paramOfSort, ...{from: from.toISOString(), to: to.toISOString()}};
+    this.data = await this.getDataFromServer();
+    this.updateElement();
+  }
+
+  getSubElements() {
+    const result = {};
+    const subElements = this.element.querySelectorAll('div[data-element]');
+    for (const subElement of subElements) {
+      const name = subElement.dataset.element;
+      result[name] = subElement;
+    }
+    return result;
+  }
+
+  async render() {
+    this.element = this.getTableElement();
+    
+    this.subElements = this.getSubElements();
+    this.addEventListeners();
+
     this.data = await this.getDataFromServer();
     this.updateElement();
   }
