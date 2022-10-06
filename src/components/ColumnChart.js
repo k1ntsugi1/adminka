@@ -26,19 +26,22 @@ export default class ColumnChart {
 
       this.render();
     }
+
     getLinkOfTitle(link) {
       return !link.length
         ? ''
         : `<a class="column-chart__link" href="${link}">View all</a>`;
     }
+
     createChart(currentValue) {
       const currentValueByScale = Math.floor(this.scale * currentValue);
-      const currentValueByPercent = (currentValue / Math.max(...this.data) * 100).toFixed(0);
       return `<div style="--value: ${currentValueByScale}" data-tooltip="${currentValue}"></div>`;
     }
+
     getColumnChartBody() {
       return this.data.map((currentValue) => this.createChart(currentValue)).join('');
     }
+
     get elementOfBodyColumnChart() {
       const element = document.createElement('div');
       const bodyOfElement = (

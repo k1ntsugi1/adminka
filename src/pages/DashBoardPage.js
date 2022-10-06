@@ -49,7 +49,7 @@ export default class DashboardPage {
     const dashbord = `
         <div class="dashboard">
             <div class="content__top-panel">
-                <h2 class="page-title">Dashboard</h2>
+                <h2 class="page-title">Панель управления</h2>
                 <div data-element="rangePicker"></div>
             </div>
             <div data-element="chartsRoot" class="dashboard__charts">
@@ -58,7 +58,7 @@ export default class DashboardPage {
                 <div data-element="customers-chart" class="dashboard__chart_customers"></div>
             </div>
 
-            <h3 class="block-title">Best sellers</h3>
+            <h3 class="block-title">Лидеры продаж</h3>
 
             <div data-element="sortableTable"></div>
         </div>`;
@@ -91,6 +91,12 @@ export default class DashboardPage {
         const data = {...dataAsArray[0]};
         data.label = typeOfChart;
         data.url = (new URL(this.path + typeOfChart, this.backendURL)).toString();
+
+        if (typeOfChart === 'sales') {
+          data.formatHeading = item => {
+            return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(item);
+          };
+        }
 
         const wrapperOfElementHTML = new Constructor(data);
         this.wrappersOfElementHTML.push(wrapperOfElementHTML);

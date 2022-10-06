@@ -15,13 +15,20 @@ const header = [
     id: 'createdAt',
     title: 'Дата',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: date => {
+      console.log(date);
+      return `<div class="sortable-table__cell">${(new Date(date).toLocaleString('ru', {day: 'numeric', month: 'long'}))}</div>`;
+    }
   },
   {
     id: 'totalCost',
     title: 'Стоимость',
     sortable: true,
-    sortType: 'number'
+    sortType: 'number',
+    template: value => {
+      return `<div class="sortable-table__cell">${new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(value)}</div>`;
+    }
   },
   {
     id: 'delivery',
