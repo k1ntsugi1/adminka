@@ -75,8 +75,7 @@ export default class Sidebar {
   }
 
   setEventListeners() {
-    const { sidebarToggler, sidebarNav } = this.subElements;
-    //sidebarNav.addEventListener('click', this.setActiveNavItemHandler);
+    const { sidebarToggler } = this.subElements;
     sidebarToggler.addEventListener('click', this.toggleSidebarHandler);
   }
 

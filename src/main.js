@@ -3,11 +3,12 @@ import SalesPage from './pages/SalesPage.js';
 import CategoriesPage from './pages/CategoriesPage.js';
 import ProductsPage from './pages/ProductsPage.js';
 import ProductFormPage from './pages/ProductFormPage.js';
+import UndefinedPage from './pages/UndefinedPage.js';
 
 import NotificationMessage from "./components/Notification.js";
 import Sidebar from "./components/Sidebar.js";
 import Tooltip from './components/Tooltip.js';
-// import UndefinedPage from './pages/UndefinedPage.js';
+
 
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
@@ -21,7 +22,7 @@ export default class Page {
 	showingPage = null
 	currentPathnameOfPage = window.location.pathname;
 
-	sidebarElement = new Sidebar()
+	sidebarWrapper = new Sidebar()
 
 	constructor() {
 	  if (Page.currentAdminPage) { return Page.currentAdminPage; }
@@ -78,7 +79,7 @@ export default class Page {
 	  const mainElement = wrapper.firstElementChild;
 	  mainElement
 	  	.querySelector('[data-element="progressBar"]')
-		.insertAdjacentElement('afterend', this.sidebarElement.element);
+		.insertAdjacentElement('afterend', this.sidebarWrapper.element);
 
 	  return mainElement;
 	}
@@ -118,13 +119,15 @@ export default class Page {
 
 		const Constructor = isFormPage
 		  ? ProductFormPage
-		  : this.pages[this.currentPathnameOfPage]; //?? UndefinedPage;
+		  : this.pages[this.currentPathnameOfPage] ?? UndefinedPage;
+
+		console.log(Constructor);
 
 		this.showingPage = new Constructor(inputData);
 
 		this.contentContainer.append(this.showingPage.element);
 
-		this.sidebarElement.setActiveNavItemHandler(this.currentPathnameOfPage);
+		this.sidebarWrapper.setActiveNavItemHandler(this.currentPathnameOfPage);
 		this.toggleProgressbar();
 	  } catch (error) {
 	    this.toggleProgressbar();
