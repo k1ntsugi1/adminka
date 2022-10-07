@@ -40,7 +40,7 @@ export default class CategoriesList {
 
     const categoryBody = `
         <div class="category category_open" data-id="${id}" data-element="category">
-            <header class="category__header">
+            <header class="category__header" data-element="categoryHeader">
                 ${title}
             </header>
             <div class="category__body">
@@ -74,9 +74,10 @@ export default class CategoriesList {
   }
 
   toggleOfOpenCategoryHandler = (event) => {
-    const target = event.target.closest('[data-element="category"]');
+    const target = event.target.closest('[data-element="categoryHeader"]');
     if (!target) {return;}
-    target.classList.toggle('category_open');
+    const elementForToggle = event.target.closest('[data-element="category"]');
+    elementForToggle.classList.toggle('category_open');
   }
 
   async render() {

@@ -151,9 +151,9 @@ export default class Page {
 			this.toggleProgressbar();
 	  } catch (error) {
 	    this.toggleProgressbar();
-		
+
 	    const notification = new NotificationMessage({
-	      message: 'Ошибка сети',
+	      message: error.message,
 	      wrapperOfElement: document.body,
 	      duration: 3000,
 	      type: 'error'

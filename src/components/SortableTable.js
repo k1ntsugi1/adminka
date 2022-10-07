@@ -52,7 +52,7 @@ export default class SortableTable {
 
   getLoadingLine() {
     return (
-      `<div data-elem="loading" class="loading-line sortable-table__loading-line"></div>`
+      `<div data-element="loading" class="loading-line sortable-table__loading-line"></div>`
     );
   }
 
@@ -123,10 +123,14 @@ export default class SortableTable {
   }
 
   updateElement() {
-    const { body, header } = this.subElements;
+    const { body, header, loading } = this.subElements;
   
     header.innerHTML = this.getTableHeader();
     body.innerHTML = this.getTableBody();
+    
+    if (this.isSortLocally) {
+      loading.remove();
+    }
   }
 
   updateQueryStringOfURL({ from, to, field, order, start, end, _embed } = this.paramOfSort) {
@@ -261,6 +265,8 @@ export default class SortableTable {
     if (this.isSortLocally) {
       this.data = this.sortOnClient();
     } else {
+      const { body } = this.subElements;
+      body.innerHTML = '';
       this.data = await this.sortOnServer();
     }
     this.updateElement();

@@ -94,7 +94,7 @@ export default class DashboardPage {
 
         if (typeOfChart === 'sales') {
           data.formatHeading = item => {
-            return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(item);
+            return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 }).format(item);
           };
         }
 
