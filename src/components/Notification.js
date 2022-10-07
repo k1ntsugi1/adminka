@@ -1,26 +1,27 @@
 export default class NotificationMessage {
-  constructor(message = '', { duration = 0, type = ''} = {}) {
+  static globalNotifictionElement = null
+
+  constructor({message = '', wrapperOfElement = document.body, duration = 0, type = ''} = {}) {
     this.message = message;
     this.duration = duration;
     this.durationStart = duration;
+    this.wrapperOfElement = wrapperOfElement;
     this.type = type;
-    
-    this.render(); 
   }
-  createElement(wrapperOfElement = null) {
-    const element = wrapperOfElement ?? document.createElement('div');
-    element.className = `${element.className} notification ${this.type}`;
+
+  createElement() {
+    const element = document.createElement('div');
     const bodyElement = `
       <div class="notification notification_${this.type} show">
         <div class="notification__content">${this.message}</div>
       </div>
     `;
-    element.insertAdjacentHTML('afterbegin', bodyElement);
-    return element;
+    element.innerHTML = bodyElement;
+    return element.firstElementChild;
   }
 
-  render(wrapperOfElement = null) {
-    this.element = this.createElement(wrapperOfElement);
+  render() {
+    this.constructor.globalNotifictionElement = this.createElement();
   }
 
   createTimer() {
@@ -43,12 +44,11 @@ export default class NotificationMessage {
     this.removeTimer();
   }
 
-  show(wrapperOfElement = null) {
+  show() {
     this.destroy();
-    if (wrapperOfElement) {this.render(wrapperOfElement);}
-    this.constructor.globalNotifictionElement = this.element;
-    document.body.append(this.constructor.globalNotifictionElement);
+    if (!this.constructor.globalNotifictionElement) {this.render();}
     this.duration = this.durationStart;
-    this.createTimer();  
+    this.createTimer();
+    this.wrapperOfElement.append(this.constructor.globalNotifictionElement);
   }
 }

@@ -115,7 +115,7 @@ export default class ColumnChart {
 
         return JSONData;
       } catch (error) {
-        alert(error);
+        throw new Error('Ошибка сети/Ошибка на сервере');
       }
     }
 

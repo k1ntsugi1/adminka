@@ -1,5 +1,6 @@
 import escapeHtml from "../store/escape-html.js";
 import SortableList from '../components/SortableList.js';
+import NotificationMessage from "./Notification.js";
 
 import grabIcon from '../styles/svg/icon-grab.svg';
 import trashIcon from '../styles/svg//icon-trash.svg';
@@ -227,9 +228,8 @@ export default class ProductForm {
       const response = await fetch(url.toString());
       if (response.ok) {return await response.json();} 
       
-      throw new Error('error at server (unmutable request)');
+      throw new Error('Ошибка сети/Ошибка на сервере');
     } catch (error) {
-      console.error(error);
       throw new Error(error);
     }
   }
@@ -254,10 +254,16 @@ export default class ProductForm {
         productForm.append(elementA);
         elementA.click();
       }
+      const notification = new NotificationMessage({
+        message: 'Товар сохранен',
+        wrapperOfElement: document.body,
+        duration: 3000,
+        type: 'success'
+      });
+      notification.show();
 
     } catch (error) {
-      console.error(error);
-      throw new Error(error);
+      throw new Error("Ошибка сети/Ошибка на сервере");
     }
   }
 
@@ -327,14 +333,15 @@ export default class ProductForm {
         body: formData,
         referrer: ''
       });
+
+      if (!response.ok) {throw new Error();}
       const responseJSON = await response.json();
 
       this.toggleStatusOfLoadingImage();
       return responseJSON.data.link;
 
-    } catch (error) {
-      console.error(error);
-      return null;
+    } catch {
+      throw new Error("Ошибка сети/Ошибка на сервере");
     }
   }
 

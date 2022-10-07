@@ -16,27 +16,27 @@ export default class Page {
 	contentContainer = null
 	showingPage = null
 	currentPathnameOfPage = window.location.pathname;
-	
+
 	constructor() {
 	  if (Page.currentAdminPage) { return Page.currentAdminPage; }
 	  Page.currentAdminPage = this;
 
 	  this.range = this.createRange();
 
-	  
+
 
 	  this.pages = {
-		  '/': DashboardPage,
-	      '/products': ProductsPage,
-	      '/categories': CategoriesPage,
-	      '/sales': SalesPage
-	    };
-	  	this.urlsOfAJAX = {
-	      '/': 'api/dashboard/',
-	       '/products': 'api/rest/products',
-	       '/categories': '/api/rest/categories',
-	       '/sales': 'api/rest/orders',
-	    };
+	    '/': DashboardPage,
+	    '/products': ProductsPage,
+	    '/categories': CategoriesPage,
+	    '/sales': SalesPage
+	  };
+	  this.urlsOfAJAX = {
+	    '/': 'api/dashboard/',
+	    '/products': 'api/rest/products',
+	    '/categories': '/api/rest/categories',
+	    '/sales': 'api/rest/orders',
+	  };
 
 	  this.render();
 	}
@@ -55,7 +55,7 @@ export default class Page {
 	  const { progressBar } = this.subElements;
 	  progressBar.hidden = !progressBar.hidden;
 	}
-  
+
 	toggleSidebarHandler = () => {
 	  document.body.classList.toggle('is-collapsed-sidebar');
 	}
@@ -113,7 +113,7 @@ export default class Page {
 	  return {
 	    mainClass: this,
 	    productId: id === 'add' ? null : id,
-	    urls: {...this.urlsOfAJAX, backendURL: BACKEND_URL}
+	    urls: { ...this.urlsOfAJAX, backendURL: BACKEND_URL }
 	  };
 	}
 
@@ -127,27 +127,40 @@ export default class Page {
 	    },
 	    url: [this.urlsOfAJAX[this.currentPathnameOfPage], BACKEND_URL],
 	  };
-	  }
+	}
 
 	updateShowingPage() {
-	  this.showingPage?.destroy();
-	  this.toggleProgressbar();
+	  try {
+			this.showingPage?.destroy();
+			this.toggleProgressbar();
 
-	  const [isFormPage] = this.currentPathnameOfPage.match(/\/products\/([a-z0-9_-]+)/i) ?? [];
+			const [isFormPage] = this.currentPathnameOfPage.match(/\/products\/([a-z0-9_-]+)/i) ?? [];
 
-	  const inputData = isFormPage 
-	  	? this.getDataOfProductFormPage()
-	    : this.getDataOfPlainPage(); 
-	
-	  const Constructor = isFormPage 
-	    ? ProductFormPage
-	  	: this.pages[this.currentPathnameOfPage]; //?? UndefinedPage;
+			const inputData = isFormPage
+			  ? this.getDataOfProductFormPage()
+			  : this.getDataOfPlainPage();
 
-	  this.showingPage = new Constructor(inputData);
+			const Constructor = isFormPage
+			  ? ProductFormPage
+			  : this.pages[this.currentPathnameOfPage]; //?? UndefinedPage;
 
-	  this.contentContainer.append(this.showingPage.element);
+			this.showingPage = new Constructor(inputData);
 
-	  this.toggleProgressbar();
+			this.contentContainer.append(this.showingPage.element);
+
+			this.toggleProgressbar();
+	  } catch (error) {
+	    this.toggleProgressbar();
+		
+	    const notification = new NotificationMessage({
+	      message: 'Ошибка сети',
+	      wrapperOfElement: document.body,
+	      duration: 3000,
+	      type: 'error'
+	    });
+	    notification.show();
+	  }
+
 	}
 
 	changePageByCustomEventHandler = (event) => {
@@ -163,13 +176,13 @@ export default class Page {
 	}
 
 	selectPageHandler = (event) => {
-	  
+
 	  const elementA = event.target.closest('a');
-	  
+
 	  const href = elementA?.getAttribute('href') ?? '';
 
-	  if (!elementA) {return;}
-	  if (!href.startsWith('/')) {return;}
+	  if (!elementA) { return; }
+	  if (!href.startsWith('/')) { return; }
 	  event.preventDefault();
 	  window.history.pushState(null, null, href);
 
@@ -196,13 +209,13 @@ export default class Page {
 
 	setEventListeners() {
 	  const { sidebarToggler } = this.subElements;
-  
+
 	  sidebarToggler.addEventListener('click', this.toggleSidebarHandler);
 	  this.element.addEventListener('click', this.selectPageHandler);
 	  this.element.addEventListener('page-selected', this.changePageByCustomEventHandler);
 	  window.addEventListener('popstate', this.changePageByPushStateHandler);
-  
-	  }
+
+	}
 
 	render() {
 	  this.element = this.mainElement;

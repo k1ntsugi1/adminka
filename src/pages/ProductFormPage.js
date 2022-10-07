@@ -52,6 +52,7 @@ export default class ProductFormPage {
       const { contentBox } = this.subElements;
 
       this.setWrapperOfElementHTML();
+      
       const element = await this.wrapperOfElementHTML.render();
 
       contentBox.append(element);
