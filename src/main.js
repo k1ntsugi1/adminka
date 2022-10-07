@@ -3,6 +3,8 @@ import SalesPage from './pages/SalesPage.js';
 import CategoriesPage from './pages/CategoriesPage.js';
 import ProductsPage from './pages/ProductsPage.js';
 import ProductFormPage from './pages/ProductFormPage.js';
+
+import Sidebar from "./components/Sidebar.js";
 // import UndefinedPage from './pages/UndefinedPage.js';
 
 
@@ -67,44 +69,12 @@ export default class Page {
 				<div class="progress-bar" data-element="progressBar" hidden>
 					<div class="progress-bar__line"></div>
 				</div>
-				<aside class="sidebar">
-					<h2 class="sidebar__title">
-						<a href="/" data-page="dashboard">shop admin</a>
-					</h2>
-					<ul class="sidebar__nav" data-element="sidebarNav">
-						<li>
-							<a href="/" data-page="dashboard">
-								<i class="icon-dashboard"></i> <span>Панель управления</span>
-							</a>
-						</li>
-						<li>
-							<a href="/products" data-page="products">
-								<i class="icon-products"></i> <span>Продукты</span>
-							</a>
-						</li>
-						<li>
-							<a href="/categories" data-page="categories">
-								<i class="icon-categories"></i> <span>Категории</span>
-							</a>
-						</li>
-						<li>
-							<a href="/sales" data-page="sales">
-								<i class="icon-sales"></i> <span>Продажи</span>
-							</a>
-						</li>
-					</ul>
-					<ul class="sidebar__nav sidebar__nav_bottom">
-						<li>
-							<button type="button" class="sidebar__toggler" data-element="sidebarToggler">
-								<i class="icon-toggle-sidebar"></i> <span>Скрыть Панель</span>
-							</button>
-						</li>
-					</ul>
-				</aside>
 				<section class="content" id="content"></section>
 			</main>`;
 	  wrapper.innerHTML = bodyOfWrapper;
-	  return wrapper.firstElementChild;
+	  const mainElement = wrapper.firstElementChild;
+	  mainElement.querySelector('[data-element="progressBar"]').insertAdjacentElement('afterend', (new Sidebar()).element);
+	  return mainElement;
 	}
 
 
@@ -131,24 +101,24 @@ export default class Page {
 
 	updateShowingPage() {
 	  try {
-			this.showingPage?.destroy();
-			this.toggleProgressbar();
+		this.showingPage?.destroy();
+		this.toggleProgressbar();
 
-			const [isFormPage] = this.currentPathnameOfPage.match(/\/products\/([a-z0-9_-]+)/i) ?? [];
+		const [isFormPage] = this.currentPathnameOfPage.match(/\/products\/([a-z0-9_-]+)/i) ?? [];
 
-			const inputData = isFormPage
-			  ? this.getDataOfProductFormPage()
-			  : this.getDataOfPlainPage();
+		const inputData = isFormPage
+		  ? this.getDataOfProductFormPage()
+		  : this.getDataOfPlainPage();
 
-			const Constructor = isFormPage
-			  ? ProductFormPage
-			  : this.pages[this.currentPathnameOfPage]; //?? UndefinedPage;
+		const Constructor = isFormPage
+		  ? ProductFormPage
+		  : this.pages[this.currentPathnameOfPage]; //?? UndefinedPage;
 
-			this.showingPage = new Constructor(inputData);
+		this.showingPage = new Constructor(inputData);
 
-			this.contentContainer.append(this.showingPage.element);
+		this.contentContainer.append(this.showingPage.element);
 
-			this.toggleProgressbar();
+		this.toggleProgressbar();
 	  } catch (error) {
 	    this.toggleProgressbar();
 
@@ -193,13 +163,7 @@ export default class Page {
 	}
 
 	setSubElements() {
-	  const hrefElementsOfPages = document.querySelectorAll('[data-pages]');
 	  const elements = document.querySelectorAll('[data-element]');
-
-	  for (const hrefElement of hrefElementsOfPages) {
-	    const name = hrefElement.dataset.page;
-	    this.subElements[name] = hrefElement;
-	  }
 
 	  for (const element of elements) {
 	    const name = element.dataset.element;
@@ -208,9 +172,6 @@ export default class Page {
 	}
 
 	setEventListeners() {
-	  const { sidebarToggler } = this.subElements;
-
-	  sidebarToggler.addEventListener('click', this.toggleSidebarHandler);
 	  this.element.addEventListener('click', this.selectPageHandler);
 	  this.element.addEventListener('page-selected', this.changePageByCustomEventHandler);
 	  window.addEventListener('popstate', this.changePageByPushStateHandler);

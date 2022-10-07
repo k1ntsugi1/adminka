@@ -1,4 +1,7 @@
 class Tooltip {
+
+  tooltiptarget = null
+
   constructor() {
     if (!Tooltip.instance) { Tooltip.instance = this; } 
     return Tooltip.instance;
@@ -33,21 +36,31 @@ class Tooltip {
     this.addPointerOutListener();
   }
 
+  toggleClassesofHoveredItem() {
+    this.tooltipTarget.classList.toggle('is-hovered');
+    this.tooltipTarget.parentElement.classList.toggle('has-hovered');
+  }
+
   pointerOverHandler = (event) => {
-    const tooltipTarget = event.target?.closest('[data-tooltip]');
-    if (!tooltipTarget) {return;}
+    this.tooltipTarget = event.target?.closest('[data-tooltip]');
+    if (!this.tooltipTarget) {return;}
     
     const { dataset: 
       {
         tooltip: newDataOfTooltip,
       },
-    } = tooltipTarget;
+    } = this.tooltipTarget;
+
+    this.toggleClassesofHoveredItem();
 
     this.createTooltip(newDataOfTooltip);
     this.addPointerMoveListener();
   }
 
   pointerOutHandler = () => {
+    this.toggleClassesofHoveredItem();
+    this.tooltipTarget = null;
+    
     this.removeTooltip();
     this.removePointerMoveListener();
   }

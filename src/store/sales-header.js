@@ -18,7 +18,7 @@ const header = [
     sortType: 'number',
     template: date => {
       console.log(date);
-      return `<div class="sortable-table__cell">${(new Date(date).toLocaleString('ru', {day: 'numeric', month: 'long'}))}</div>`;
+      return `<div class="sortable-table__cell">${(new Date(date).toLocaleString('ru', {day: 'numeric', month: 'long', year: '2-digit'}))}</div>`;
     }
   },
   {
