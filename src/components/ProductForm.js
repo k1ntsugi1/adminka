@@ -236,6 +236,7 @@ export default class ProductForm {
 
   async fetchMutableRequest(method, body) {
     const { product } = this.urls;
+    const {productForm} = this.subElements;
     try {
       const response = await fetch(product.toString(), {
         method,
@@ -246,6 +247,14 @@ export default class ProductForm {
       });
 
       if (!response.ok) {throw new Error('error at server (mutable request)');}
+
+      if (method === 'PUT') {
+        const elementA = document.createElement('a');
+        elementA.setAttribute('href', `/products/${body['id']}`);
+        productForm.append(elementA);
+        elementA.click();
+      }
+
     } catch (error) {
       console.error(error);
       throw new Error(error);
@@ -366,23 +375,13 @@ export default class ProductForm {
 
   submitHandler = (event) => {
     event.preventDefault();
-    const {productForm} = this.subElements;
     const formData = this.getFormatedFormData();
 
-    const [isNewProduct, method] = this.productId 
-      ? [false, 'PATCH']
-      : [true, 'PUT'];
+    const method = this.productId 
+      ? 'PATCH'
+      : 'PUT';
 
     this.fetchMutableRequest(method, formData);
-    
-    if (isNewProduct) {
-      const elementA = document.createElement('a');
-      elementA.setAttribute('href', `/products/${formData['id']}`);
-      productForm.append(elementA);
-  
-      elementA.click();
-    }
-
   }
 
   removeListItemHandler = (event) => {
