@@ -121,8 +121,6 @@ export default class Page {
 		  ? ProductFormPage
 		  : this.pages[this.currentPathnameOfPage] ?? UndefinedPage;
 
-		console.log(Constructor);
-
 		this.showingPage = new Constructor(inputData);
 
 		this.contentContainer.append(this.showingPage.element);

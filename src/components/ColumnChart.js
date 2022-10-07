@@ -30,7 +30,7 @@ export default class ColumnChart {
     getLinkOfTitle(link) {
       return !link.length
         ? ''
-        : `<a class="column-chart__link" href="${link}">View all</a>`;
+        : `<a class="column-chart__link" href="${link}">Подробнее</a>`;
     }
 
     createChart(currentValue) {

@@ -25,7 +25,7 @@ export default class DashboardPage {
     
     this.inputData = {
       rangePicker: [this.range],
-      chart: [{range: this.range, link: '#'}], // dont fogget join pathname
+      chart: [{range: this.range, link: ''}],
       sortableTable: [header, {
         range: this.range, 
         url: (new URL(this.path + 'bestsellers', this.backendURL)).toString(),
@@ -96,6 +96,8 @@ export default class DashboardPage {
             return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 }).format(item);
           };
         }
+
+        if (typeOfChart === 'orders') {data.link = '/sales';}
 
         const wrapperOfElementHTML = new Constructor(data);
         this.wrappersOfElementHTML.push(wrapperOfElementHTML);
