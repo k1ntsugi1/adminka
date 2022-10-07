@@ -37,8 +37,8 @@ class Tooltip {
   }
 
   toggleClassesofHoveredItem() {
-    this.tooltipTarget.classList.toggle('is-hovered');
-    this.tooltipTarget.parentElement.classList.toggle('has-hovered');
+    this.tooltipTarget?.classList.toggle('is-hovered');
+    this.tooltipTarget?.parentElement.classList.toggle('has-hovered');
   }
 
   pointerOverHandler = (event) => {
