@@ -4,7 +4,9 @@ import CategoriesPage from './pages/CategoriesPage.js';
 import ProductsPage from './pages/ProductsPage.js';
 import ProductFormPage from './pages/ProductFormPage.js';
 
+import NotificationMessage from "./components/Notification.js";
 import Sidebar from "./components/Sidebar.js";
+import Tooltip from './components/Tooltip.js';
 // import UndefinedPage from './pages/UndefinedPage.js';
 
 
@@ -19,13 +21,13 @@ export default class Page {
 	showingPage = null
 	currentPathnameOfPage = window.location.pathname;
 
+	sidebarElement = new Sidebar()
+
 	constructor() {
 	  if (Page.currentAdminPage) { return Page.currentAdminPage; }
 	  Page.currentAdminPage = this;
 
 	  this.range = this.createRange();
-
-
 
 	  this.pages = {
 	    '/': DashboardPage,
@@ -72,8 +74,12 @@ export default class Page {
 				<section class="content" id="content"></section>
 			</main>`;
 	  wrapper.innerHTML = bodyOfWrapper;
+
 	  const mainElement = wrapper.firstElementChild;
-	  mainElement.querySelector('[data-element="progressBar"]').insertAdjacentElement('afterend', (new Sidebar()).element);
+	  mainElement
+	  	.querySelector('[data-element="progressBar"]')
+		.insertAdjacentElement('afterend', this.sidebarElement.element);
+
 	  return mainElement;
 	}
 
@@ -118,6 +124,7 @@ export default class Page {
 
 		this.contentContainer.append(this.showingPage.element);
 
+		this.sidebarElement.setActiveNavItemHandler(this.currentPathnameOfPage);
 		this.toggleProgressbar();
 	  } catch (error) {
 	    this.toggleProgressbar();
@@ -186,6 +193,7 @@ export default class Page {
 
 	  this.setSubElements();
 	  this.setEventListeners();
+	  (new Tooltip()).initialize();
 
 	  this.updateShowingPage();
 	}

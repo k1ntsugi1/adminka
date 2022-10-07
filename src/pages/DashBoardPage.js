@@ -1,7 +1,6 @@
 import RangePicker from '../components/RangePicker.js';
 import SortableTable from '../components/SortableTable.js';
 import ColumnChart from '../components/ColumnChart.js';
-import Tooltip from '../components/Tooltip.js';
 
 import header from '../store/product-header.js';
 
@@ -147,7 +146,6 @@ export default class DashboardPage {
     this.element = this.dashbordElement;
 
     this.setSubElements();
-    (new Tooltip()).initialize();
     this.addEventListeners();
 
     this.update();

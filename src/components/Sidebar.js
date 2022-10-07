@@ -12,26 +12,26 @@ export default class Sidebar {
     const bodyOfWrapper = `
         <aside class="sidebar">
 					<h2 class="sidebar__title">
-						<a href="/" data-page="dashboard">shop admin</a>
+						<a href="/">shop admin</a>
 					</h2>
 					<ul class="sidebar__nav" data-element="sidebarNav">
-						<li class="active">
-							<a href="/" data-page="dashboard">
+						<li class="active" data-page="/">
+							<a href="/" >
 								<i class="icon-dashboard"></i> <span>Панель управления</span>
 							</a>
 						</li>
-						<li>
-							<a href="/products" data-page="products">
+						<li data-page="/products">
+							<a href="/products" >
 								<i class="icon-products"></i> <span>Продукты</span>
 							</a>
 						</li>
-						<li>
-							<a href="/categories" data-page="categories">
+						<li data-page="/categories">
+							<a href="/categories" >
 								<i class="icon-categories"></i> <span>Категории</span>
 							</a>
 						</li>
-						<li>
-							<a href="/sales" data-page="sales">
+						<li data-page="/sales">
+							<a href="/sales" >
 								<i class="icon-sales"></i> <span>Продажи</span>
 							</a>
 						</li>
@@ -50,7 +50,6 @@ export default class Sidebar {
 
   setSubElements() {
     const elements = this.element.querySelectorAll('[data-element]');
-    console.log(elements)
 
     for (const element of elements) {
       const name = element.dataset.element;
@@ -62,19 +61,22 @@ export default class Sidebar {
     document.body.classList.toggle('is-collapsed-sidebar');
   }
 
-  setActiveNavItemHandler = (event) => {
-    const target = event.target.closest('li');
-    if (!target) {return;}
+  setActiveNavItemHandler = (href) => {
+    
+    const { sidebarNav } = this.subElements;
+    const [formatedHref] = href.match(/^\/[^/]*/i);
 
-    this.activeNavItem.classList.remove('active');
+    const target = sidebarNav.querySelector(`[data-page="${formatedHref}"]`);
 
-    target.classList.add('active');
+    this.activeNavItem?.classList.remove('active');
+
+    target?.classList.add('active');
     this.activeNavItem = target;
   }
 
   setEventListeners() {
     const { sidebarToggler, sidebarNav } = this.subElements;
-    sidebarNav.addEventListener('click', this.setActiveNavItemHandler);
+    //sidebarNav.addEventListener('click', this.setActiveNavItemHandler);
     sidebarToggler.addEventListener('click', this.toggleSidebarHandler);
   }
 
