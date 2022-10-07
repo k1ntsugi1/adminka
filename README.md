@@ -1,26 +1,63 @@
-[![Tests workflow](https://github.com/k1ntsugi1/js-20220905_bulat9/actions/workflows/tests.yaml/badge.svg)](https://github.com/k1ntsugi1/js-20220905_bulat9/actions/workflows/tests.yaml)
+## In process
 
-**In process**
+# Admin Dashboard
 
-[**Versel**](https://js-20220905-bulat9.vercel.app/) - прод
+**Important!**
 
+For correct build via Webpack you must have:
 
-В данный момент проблемы:
+* nodejs >=16.13.1
+* npm >= 7.10.0
 
-  -  со стилями (не все стили есть в этом проекте, придется все же воспользоваться проектом, что вы скинули на прошлом занятии)
-  - не вешаются слушатели в форме продукта
-  - ~~добавить обработку формы при нажатии на продукт из страницы "Sales" (не корректно парсятся данные)~~
+Данный проект был разработан в рамках курса ["JavaScript/​DOM/​Интерфейсы" для программистов](https://learn.javascript.ru/courses/js)
+проекта [learn.javascript.ru](https://learn.javascript.ru/)
+
+> Этот курс предназначен для изучения JavaScript программистами, а также для тех, кто разрабатывал на нём эпизодически и теперь хочет освоить профессионально.
+
+Проект - это фронтенд часть типичной "Панели управления" для магазина товаров,
+реализованная на чистом JavaScript.
+
+## Preview
+
+[**Preview**](https://js-20220905-bulat9.vercel.app/)
+
+## Tech stack
+
+* <img alt="javascript" width="26px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/javascript.png" /> Javascript
+* <img alt="html" width="26px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/html.png" /> HTML
+* <img alt="CSS" width="26px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/css.png" /> CSS
+
+## To start project in development mode:
+
+* `npm install` - установит необходимые зависимости
+* `npm run develop` - запустит "WebpackDevServer"
+
+**Note:** Версии требуемые проектом указаны в `package.json` в поле `engines`
+
+## To build project:
+
+`npm run build` - "соберет" проект в "production" режиме.
+
+## Teacher
+
+**Владимир Шевчук**
+
+* [<img alt="GitHub" width="18px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/github-logo.png" /> GitHub](https://github.com/dosandk)
+* [<img alt="learn.javascript" width="18px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/learn-javascript-logo.png" /> learn.javascript](http://learn.javascript.ru/profile/v-shevchuk)
+* [<img alt="Linkedin" width="18px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/linkedin-logo.png" /> Linkedin](https://www.linkedin.com/in/dosandk/)
+
+## В данный момент проблемы:
   - в целом есть части кода, которые я написал "в лоб"
   
-tasks:
+## Задачи:
 
   - ~~DashBoardPage~~
   - ~~ProductsPage~~
   - ~~SalesPage~~
   - ~~CategoriesPage (реализовал и данный компонент)~~
   - ProductFormPage (~~корректное удаление слушателей~~, разобраться почему не работают слушатели)
+  - ~~UndefinedPage~~
   - ~~сделать слушателя, реагирующего на нажатия кнопок истории переходов <- , ->~~
   - рефакторинг
   - добавить контроллер для прерывания fetch запросов
   - ~~собрать проект ( в конфиге вебпака может быть лишнее, так как я взял его со своего старого проекта и удалил, что точно не к месту )~~
-  - сделать форк проекта, что скинули и запушить туда
