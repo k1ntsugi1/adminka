@@ -342,7 +342,6 @@ export default class ProductForm {
     const inputIMGLoader = this.getInputIMGLoader();
 
     inputIMGLoader.onchange = async () => {
-      console.log(1234)
       const formData = new FormData();
       const file = inputIMGLoader.files[0];
       formData.append(inputIMGLoader.name, file);
@@ -367,18 +366,23 @@ export default class ProductForm {
 
   submitHandler = (event) => {
     event.preventDefault();
+    const {productForm} = this.subElements;
     const formData = this.getFormatedFormData();
 
-    const [nameOfEvent, method] = this.productId 
-      ? ['product-updated', 'PATCH'] 
-      : ['product-saved', 'PUT'];
-
-    this.element.dispatchEvent(new CustomEvent(nameOfEvent, {
-      bubles: true,
-      detail: formData,
-    }));
+    const [isNewProduct, method] = this.productId 
+      ? [false, 'PATCH']
+      : [true, 'PUT'];
 
     this.fetchMutableRequest(method, formData);
+    
+    if (isNewProduct) {
+      const elementA = document.createElement('a');
+      elementA.setAttribute('href', `/products/${formData['id']}`);
+      productForm.append(elementA);
+  
+      elementA.click();
+    }
+
   }
 
   removeListItemHandler = (event) => {
@@ -411,9 +415,7 @@ export default class ProductForm {
   addEventListeners() {
 
     const { productForm, imageListContainer } = this.subElements;
-
     productForm.addEventListener('submit', this.submitHandler);
-    productForm.save.addEventListener('click', () => console.log('clicked'))
     productForm.uploadImage.addEventListener('click', this.loadImgHander);
     imageListContainer.addEventListener('pointerdown', this.removeListItemHandler);
   }
@@ -439,13 +441,13 @@ export default class ProductForm {
   }
 
   async render() {
-    // this.element = this.getElement();
     this.data = await this.getData();
     this.element = this.getElement();
-    
+    this.createImages();
+
     this.setSubElements();
     this.addEventListeners();
-
+    
     if (this.productId) { this.createProduct(); }
 
     return this.element;

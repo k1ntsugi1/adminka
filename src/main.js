@@ -23,6 +23,8 @@ export default class Page {
 
 	  this.range = this.createRange();
 
+	  
+
 	  this.pages = {
 		  '/': DashboardPage,
 	      '/products': ProductsPage,
@@ -161,15 +163,14 @@ export default class Page {
 	}
 
 	selectPageHandler = (event) => {
-	  event.preventDefault();
-
+	  
 	  const elementA = event.target.closest('a');
 	  
 	  const href = elementA?.getAttribute('href') ?? '';
 
 	  if (!elementA) {return;}
 	  if (!href.startsWith('/')) {return;}
-
+	  event.preventDefault();
 	  window.history.pushState(null, null, href);
 
 	  event.target.dispatchEvent(new CustomEvent('page-selected', {
