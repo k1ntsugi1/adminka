@@ -39,7 +39,7 @@ export default class Page {
 	  this.urlsOfAJAX = {
 	    '/': 'api/dashboard/',
 	    '/products': 'api/rest/products',
-	    '/categories': '/api/rest/categories',
+	    '/categories': ['/api/rest/categories', 'api/rest/subcategories'],
 	    '/sales': 'api/rest/orders',
 	  };
 

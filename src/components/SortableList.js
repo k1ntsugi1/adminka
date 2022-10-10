@@ -56,6 +56,13 @@ export default class SortableList {
 
     document.removeEventListener('pointermove', this.handlerMove);
     document.removeEventListener('pointerup', this.handlerDrop);
+    event.target.dispatchEvent(new CustomEvent('position-changed', {
+      bubbles: true,
+      detail: {
+        startPositions: this.items,
+        endPositions: Array.from(this.element.children),
+      }
+    }));
   }
 
   handlerMove = (event) => {
