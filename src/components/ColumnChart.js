@@ -1,3 +1,5 @@
+import errorHandler from "../store/errorHandler";
+
 export default class ColumnChart {
     chartHeight = 50;
     data = []
@@ -115,7 +117,8 @@ export default class ColumnChart {
 
         return JSONData;
       } catch (error) {
-        throw new Error('Ошибка сети/Ошибка на сервере');
+        errorHandler(error);
+        //throw new Error('Ошибка сети/Ошибка на сервере');
       }
     }
 

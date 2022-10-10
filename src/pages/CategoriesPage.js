@@ -1,6 +1,8 @@
 import CategoriesList from "../components/CategoriesList.js";
 import NotificationMessage from "../components/Notification.js";
 
+import errorHandler from "../store/errorHandler.js";
+
 export default class CategoriesPage {
   constructor({mainClass, url}) {
     const [[categoriesPath, subcategoriesPath], backendURL] = url;
@@ -44,6 +46,7 @@ export default class CategoriesPage {
       notification.show();
 
     } catch (error) {
+      errorHandler(error);
       throw new Error(error.message);
     }
   }
@@ -60,7 +63,6 @@ export default class CategoriesPage {
       const requestData = endPositions.map((element, index) => {
         return {id: element.dataset.id, weight: index + 1};
       });
-      console.log(requestData);
       this.fetchNewPositions(requestData);
     }
   }

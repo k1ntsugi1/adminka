@@ -2,6 +2,8 @@ import escapeHtml from "../store/escape-html.js";
 import SortableList from '../components/SortableList.js';
 import NotificationMessage from "./Notification.js";
 
+import errorHandler from "../store/errorHandler.js";
+
 import grabIcon from '../styles/svg/icon-grab.svg';
 import trashIcon from '../styles/svg//icon-trash.svg';
 
@@ -230,7 +232,8 @@ export default class ProductForm {
       
       throw new Error('Ошибка сети/Ошибка на сервере');
     } catch (error) {
-      throw new Error(error);
+      errorHandler(error);
+      //throw new Error(error);
     }
   }
 
@@ -263,7 +266,8 @@ export default class ProductForm {
       notification.show();
 
     } catch (error) {
-      throw new Error("Ошибка сети/Ошибка на сервере");
+      errorHandler(error);
+      //throw new Error("Ошибка сети/Ошибка на сервере");
     }
   }
 
@@ -334,14 +338,15 @@ export default class ProductForm {
         referrer: ''
       });
 
-      if (!response.ok) {throw new Error();}
+      if (!response.ok) {throw new Error("Ошибка сети/Ошибка на сервере");}
       const responseJSON = await response.json();
 
       this.toggleStatusOfLoadingImage();
       return responseJSON.data.link;
 
-    } catch {
-      throw new Error("Ошибка сети/Ошибка на сервере");
+    } catch (error) {
+      errorHandler(error);
+      //throw new Error("Ошибка сети/Ошибка на сервере");
     }
   }
 

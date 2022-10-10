@@ -9,7 +9,7 @@ import NotificationMessage from "./components/Notification.js";
 import Sidebar from "./components/Sidebar.js";
 import Tooltip from './components/Tooltip.js';
 
-
+import errorHandler from "./store/errorHandler.js";
 
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 
@@ -127,16 +127,10 @@ export default class Page {
 
 		this.sidebarWrapper.setActiveNavItemHandler(this.currentPathnameOfPage);
 		this.toggleProgressbar();
+
 	  } catch (error) {
 	    this.toggleProgressbar();
-
-	    const notification = new NotificationMessage({
-	      message: error.message,
-	      wrapperOfElement: document.body,
-	      duration: 3000,
-	      type: 'error'
-	    });
-	    notification.show();
+	    errorHandler(error);
 	  }
 
 	}
