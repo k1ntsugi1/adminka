@@ -249,7 +249,7 @@ export default class ProductForm {
         body: JSON.stringify(body)
       });
 
-      if (!response.ok) {throw new Error('error at server (mutable request)');}
+      if (!response.ok) {throw new Error('Ошибка сети/Ошибка на сервере');}
 
       if (method === 'PUT') {
         const elementA = document.createElement('a');
