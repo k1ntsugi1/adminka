@@ -11,11 +11,10 @@ export default class ProductFormPage {
       this.Constructor = ProductForm;
 
       this.urlsForAJAX = {
-        categoriesURL: (new URL(urls['/categories'], urls['backendURL'])),
+        categoriesURL: (new URL(urls['/categories'][0], urls['backendURL'])),
         productURL: (new URL(urls['/products'], urls['backendURL'])),
         imageURL: '3/image'
       };
-
       this.render();
     }
 
