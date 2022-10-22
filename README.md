@@ -46,18 +46,4 @@ For correct build via Webpack you must have:
 * [<img alt="learn.javascript" width="18px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/learn-javascript-logo.png" /> learn.javascript](http://learn.javascript.ru/profile/v-shevchuk)
 * [<img alt="Linkedin" width="18px" src="https://raw.githubusercontent.com/boris-catsvill/project-structure/master/tech-stack/linkedin-logo.png" /> Linkedin](https://www.linkedin.com/in/dosandk/)
 
-## В данный момент проблемы:
-  - в целом есть части кода, которые я написал "в лоб"
-  
-## Задачи:
 
-  - ~~DashBoardPage~~
-  - ~~ProductsPage~~
-  - ~~SalesPage~~
-  - ~~CategoriesPage (реализовал и данный компонент)~~
-  - ProductFormPage (~~корректное удаление слушателей~~, разобраться почему не работают слушатели)
-  - ~~UndefinedPage~~
-  - ~~сделать слушателя, реагирующего на нажатия кнопок истории переходов <- , ->~~
-  - рефакторинг
-  - добавить контроллер для прерывания fetch запросов
-  - ~~собрать проект ( в конфиге вебпака может быть лишнее, так как я взял его со своего старого проекта и удалил, что точно не к месту )~~
