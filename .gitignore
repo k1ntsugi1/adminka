@@ -143,3 +143,18 @@ teacher.karma.conf.js
 
 teacher*
 TODO.md
+/01-intro/
+/02-javascript-data-types/
+/03-objects-arrays-intro-to-testing/
+/04-oop-basic-intro-to-dom/
+/05-dom-document-loading/
+/06-events-practice/
+/07-async-code-fetch-api-part-1/
+/08-forms-fetch-api-part-2/
+/09-tests-for-frontend-apps/
+/10-routes-browser-history-api/
+/CONTRIBUTION.md/
+/jest-json-reporter.js/
+/jest-setup-files-after-env.js/
+/jest.config/
+/.github/
